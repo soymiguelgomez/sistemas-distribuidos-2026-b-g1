@@ -1,0 +1,89 @@
+@startuml seq-payment
+
+title Futbolix — Payment Processing, approved path (SEQ-04)
+
+actor "Customer" as CUSTOMER
+participant "Web App\n(React + Vite)" as WEB
+participant "API Gateway\n:8080" as GATEWAY
+participant "payment-service\n:8084" as PAYMENT
+database "payment schema" as PAYMENT_DB
+participant "Wompi Sandbox" as WOMPI
+queue "RabbitMQ\nfutbolix.events" as BUS
+participant "reservation-service\n:8083" as RESERVATION
+database "reservation schema" as RESERVATION_DB
+
+note over CUSTOMER, RESERVATION_DB
+  Precondition (MVP 1): the reservation exists as PENDING (SEQ-03) and
+  payment-service consumed ReservationCreated, recording a PENDING payment (HU-PAY-002).
+end note
+
+== Start the checkout (HU-PAY-003) ==
+
+CUSTOMER -> WEB : "Continuar al pago" on /booking/payment
+WEB -> GATEWAY : start checkout\n{reservationCode} + Idempotency-Key
+note right of GATEWAY
+  Public endpoint, no JWT.
+  Operation defined in the proposed
+  payment-service.yaml (HU-ARC-002).
+end note
+GATEWAY -> PAYMENT : forward request
+PAYMENT -> PAYMENT_DB : find the PENDING payment\nof the reservation
+PAYMENT_DB --> PAYMENT : payment (amount, currency COP)
+PAYMENT -> WOMPI : create transaction through the ACL\n(amount taken from the payment,\nnever from the client)
+WOMPI --> PAYMENT : Wompi transaction identifier
+PAYMENT -> PAYMENT_DB : store wompi_transaction_id\n(payment stays PENDING)
+PAYMENT --> GATEWAY : 201 checkout data
+GATEWAY --> WEB : 201 checkout data
+WEB --> CUSTOMER : redirect to the Wompi checkout
+
+== Customer pays at Wompi ==
+
+CUSTOMER -> WOMPI : enters card data
+note right of WOMPI
+  Card data goes to Wompi directly.
+  Futbolix never receives it.
+end note
+
+== Apply the result (HU-PAY-004) ==
+
+WOMPI -> GATEWAY : webhook + X-Event-Checksum
+note right of GATEWAY
+  HTTPS only. Path pending (Q-002).
+  Reachability from a local
+  environment pending (Q-001).
+end note
+GATEWAY -> PAYMENT : forward webhook
+PAYMENT -> PAYMENT : verify signature\n(invalid path: see SEQ-08)
+PAYMENT -> PAYMENT_DB : PENDING → APPROVED\n(unique wompi_transaction_id:\na duplicate changes nothing)
+PAYMENT -> BUS : publish PaymentApproved v1\n(routing key payment.approved)
+PAYMENT --> GATEWAY : 200
+GATEWAY --> WOMPI : 200
+
+== Confirm the reservation (HU-RES-005) ==
+
+BUS -> RESERVATION : deliver PaymentApproved\n(at-least-once)
+RESERVATION -> RESERVATION_DB : in one transaction:\n1. insert eventId into processed_events\n2. Reservation.confirm(): PENDING → CONFIRMED
+note right of RESERVATION
+  A repeated eventId violates the
+  processed_events primary key and the
+  transaction rolls back: one transition.
+  A reservation no longer PENDING is not
+  changed; the outcome is ADR-005's.
+end note
+
+== Customer returns ==
+
+WOMPI --> CUSTOMER : redirect back to Futbolix
+CUSTOMER -> WEB : /booking/confirmation/:code
+WEB -> GATEWAY : look up reservation by code (HU-RES-004)
+GATEWAY -> RESERVATION : forward
+RESERVATION --> GATEWAY : reservation status
+GATEWAY --> WEB : reservation status
+WEB --> CUSTOMER : reservation code shown large,\nwith a copy button
+
+note over CUSTOMER, RESERVATION_DB
+  The webhook and the customer's redirect are independent: either may arrive first.
+  If the redirect wins, the lookup can still return PENDING (Q-012).
+end note
+
+@enduml

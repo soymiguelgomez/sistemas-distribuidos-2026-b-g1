@@ -1,0 +1,41 @@
+@startuml state-payment-lifecycle
+
+title Futbolix — Payment Lifecycle (ST-02)
+
+hide empty description
+
+[*] --> PENDING : ReservationCreated consumed\n(idempotent by eventId — HU-PAY-002)
+
+PENDING --> APPROVED : Wompi result "approved"\n[signature verified]\n/ publish PaymentApproved
+PENDING --> REJECTED : Wompi result "rejected"\n[signature verified]\n/ publish PaymentRejected
+
+APPROVED --> REFUNDED : ReservationCancelled consumed\n/ refund through Wompi (HU-PAY-005)
+
+APPROVED --> [*]
+REJECTED --> [*]
+REFUNDED --> [*]
+
+note right of PENDING
+  Amount = court hourly price x hours,
+  computed server-side by the reservation.
+  A client-supplied amount is never trusted.
+end note
+
+note left of APPROVED
+  Wompi Sandbox integration boundary:
+  results enter only through the webhook
+  handled by the payment-service ACL.
+  Invalid signature: discarded, no transition,
+  PAYMENT_WEBHOOK_SIGNATURE_INVALID logged.
+  The same transaction result received twice
+  causes one transition (unique wompi_transaction_id).
+end note
+
+note right of REFUNDED
+  INV-002: PENDING never moves directly to REFUNDED.
+  INV-003: only an APPROVED payment can be REFUNDED.
+  Refund is in the MVP 2 pull list; Wompi Sandbox
+  refund support is not documented (Q-007).
+end note
+
+@enduml

@@ -1,0 +1,269 @@
+openapi: 3.0.3
+
+info:
+  title: Futbolix Payment Service API
+  version: 0.1.0
+  description: |
+    API for the Futbolix payment-service.
+
+    **Status: Proposed — pending API Review (Tech Lead).** Contract-first draft
+    written during MVP 2 planning so that HU-PAY-003 and HU-PAY-004 can meet
+    the Definition of Ready, and so that the web app and payment-service can be
+    built in parallel against the same contract.
+
+    The payment-service processes reservation payments through Wompi Sandbox.
+    Payments are real, in sandbox/test mode. Futbolix never receives or stores
+    card data: the customer enters it at Wompi directly.
+
+    A PENDING payment is created asynchronously when the payment-service
+    consumes the `ReservationCreated` event (see `02-domain/domain-events.md`).
+    This contract covers only the synchronous REST surface:
+
+    1. Start the Wompi Sandbox checkout for a reservation (public, customer).
+    2. Receive the Wompi Sandbox payment result (public, provider callback,
+       protected by signature verification).
+
+    Traceability: FR-017 to FR-023.
+
+    Points that API Review must close before this contract is accepted:
+
+    - **Q-002 — webhook path.** `00-governance/security-rules.md` uses
+      `/api/payments/wompi/webhook`; `07-api/guidelines.md` sets the base path
+      `/api/v1`. This draft uses `/payments/wompi/webhook` under `/api/v1`.
+    - **Q-011 — reservation key.** `07-api/guidelines.md` requires the
+      reservation business code for customer operations, but the
+      `ReservationCreated` v1 payload carries `reservationId` and not the
+      reservation code, so the payment-service cannot resolve a code today.
+      This draft follows the guideline and uses `reservationCode`; accepting it
+      requires adding the code to the event as an optional, backward-compatible
+      field.
+    - **ADR-007 — reservation code format.** Pending; the pattern below only
+      enforces the documented column size (`VARCHAR(20)`).
+    - **Checkout data.** Which Wompi checkout mechanism the ACL uses is not
+      documented; the contract exposes only the URL the web app redirects to.
+
+servers:
+  - url: http://localhost:8084/api/v1
+    description: Local development
+
+  - url: https://api.dev.{domain}/api/v1
+    description: Development environment
+    variables:
+      domain:
+        default: example.com
+
+# Every operation in this service is public: customers do not authenticate,
+# and the Wompi callback is authenticated by its signature instead of a JWT.
+security: []
+
+tags:
+  - name: Payments
+    description: Customer payment flow through Wompi Sandbox.
+  - name: Webhooks
+    description: Payment results sent by Wompi Sandbox.
+  - name: Health
+    description: Payment service health check.
+
+paths:
+  /health:
+    get:
+      summary: Health check
+      description: Verifies that the payment-service is running and its required dependencies are available.
+      operationId: getHealth
+      tags:
+        - Health
+      security: []
+      responses:
+        '200':
+          description: Payment service is healthy.
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - status
+                  - timestamp
+                properties:
+                  status:
+                    type: string
+                    enum:
+                      - ok
+                    example: ok
+                  timestamp:
+                    $ref: './_shared.yaml#/components/schemas/Timestamp'
+                  dependencies:
+                    type: object
+                    description: Status of required service dependencies.
+                    additionalProperties:
+                      type: string
+                      enum:
+                        - ok
+                        - degraded
+                        - down
+                    example:
+                      database: ok
+                      broker: ok
+        '503':
+          $ref: './_shared.yaml#/components/responses/ServiceUnavailable'
+
+  /payments/checkouts:
+    post:
+      summary: Start the Wompi Sandbox checkout
+      description: |
+        Starts the Wompi Sandbox checkout for the PENDING payment of a
+        reservation and returns the URL the web app redirects the customer to.
+        Implements HU-PAY-003 (FR-017, FR-018, FR-019).
+
+        - The amount is taken from the recorded payment (court hourly price x
+          hours, computed server-side). No amount is accepted from the client.
+        - The payment remains PENDING; its Wompi transaction identifier is stored.
+        - Repeating the request with the same `Idempotency-Key` returns the
+          original result and never creates a second Wompi transaction.
+        - An unknown code and a code whose payment has not been recorded yet
+          receive the same generic 404, so the response never confirms that a
+          reservation code exists. Because the payment is created
+          asynchronously from `ReservationCreated`, a 404 right after the
+          reservation is created can be transient.
+      operationId: startCheckout
+      tags:
+        - Payments
+      security: []
+      parameters:
+        - $ref: '#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/StartCheckoutRequest'
+            example:
+              reservationCode: FTX7Q2K9M4
+      responses:
+        '201':
+          description: Checkout started. The payment remains PENDING.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CheckoutResponse'
+              example:
+                status: PENDING
+                amount:
+                  amount: 120000
+                  currency: COP
+                checkoutUrl: https://checkout.example.com/redirect
+        '400':
+          $ref: './_shared.yaml#/components/responses/BadRequest'
+        '404':
+          $ref: './_shared.yaml#/components/responses/NotFound'
+        '409':
+          description: The payment is no longer PENDING.
+          content:
+            application/json:
+              schema:
+                $ref: './_shared.yaml#/components/schemas/ErrorResponse'
+              example:
+                error: PAYMENT_NOT_PENDING
+                message: The payment for this reservation can no longer be started
+        '503':
+          description: Wompi Sandbox did not respond in time or is unavailable. The payment remains PENDING.
+          content:
+            application/json:
+              schema:
+                $ref: './_shared.yaml#/components/schemas/ErrorResponse'
+              example:
+                error: SERVICE_UNAVAILABLE
+                message: The payment provider is temporarily unavailable
+        '500':
+          $ref: './_shared.yaml#/components/responses/InternalError'
+
+  /payments/wompi/webhook:
+    post:
+      summary: Receive a Wompi Sandbox payment result
+      description: |
+        Callback used by Wompi Sandbox to report the result of a transaction.
+        Implements HU-PAY-004 (FR-019 to FR-023).
+
+        - The signature is verified before the payload is trusted. An invalid
+          signature is discarded, logged as `PAYMENT_WEBHOOK_SIGNATURE_INVALID`
+          and answered with 401; no state changes and no event is published.
+        - An approved result moves the payment from PENDING to APPROVED and
+          publishes `PaymentApproved`; a rejected result moves it to REJECTED
+          and publishes `PaymentRejected` (exchange `futbolix.events`).
+        - The same transaction result received twice changes the payment once;
+          the repeat is acknowledged with 200.
+        - Reachable over HTTPS only. The request body format is defined by
+          Wompi, not by Futbolix, and is read only by the ACL.
+      operationId: receiveWompiEvent
+      tags:
+        - Webhooks
+      security: []
+      parameters:
+        - name: X-Event-Checksum
+          in: header
+          required: true
+          description: Signature sent by Wompi Sandbox, verified with the webhook secret held only by the payment-service.
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              description: Wompi Sandbox event, defined by the provider.
+              additionalProperties: true
+      responses:
+        '200':
+          description: Result applied, or a repeated result acknowledged without changes.
+        '400':
+          $ref: './_shared.yaml#/components/responses/BadRequest'
+        '401':
+          description: Invalid signature. The payload was discarded.
+        '500':
+          $ref: './_shared.yaml#/components/responses/InternalError'
+
+components:
+  parameters:
+    IdempotencyKey:
+      name: Idempotency-Key
+      in: header
+      required: true
+      description: Client-generated key. Repeating a request with the same key returns the original result.
+      schema:
+        type: string
+        format: uuid
+        example: 3f0e6a2c-8f7b-4d1e-9a51-6c2d8e4b7a10
+
+  schemas:
+    StartCheckoutRequest:
+      type: object
+      required:
+        - reservationCode
+      properties:
+        reservationCode:
+          type: string
+          minLength: 1
+          maxLength: 20
+          description: Reservation business code returned when the reservation was created. Format pending ADR-007.
+          example: FTX7Q2K9M4
+
+    CheckoutResponse:
+      type: object
+      required:
+        - status
+        - amount
+        - checkoutUrl
+      properties:
+        status:
+          type: string
+          enum:
+            - PENDING
+          description: Payment status after the checkout starts. It changes only through the Wompi result.
+          example: PENDING
+        amount:
+          $ref: './_shared.yaml#/components/schemas/Money'
+        checkoutUrl:
+          type: string
+          format: uri
+          description: Wompi Sandbox checkout URL the web app redirects the customer to.
+          example: https://checkout.example.com/redirect

@@ -1,0 +1,57 @@
+@startuml seq-payment-rejected
+
+title Futbolix — Payment Rejection (SEQ-08)
+
+actor "Customer" as CUSTOMER
+participant "Web App\n(React + Vite)" as WEB
+participant "API Gateway\n:8080" as GATEWAY
+participant "payment-service\n:8084" as PAYMENT
+database "payment schema" as PAYMENT_DB
+participant "Wompi Sandbox" as WOMPI
+queue "RabbitMQ\nfutbolix.events" as BUS
+participant "reservation-service\n:8083" as RESERVATION
+database "reservation schema" as RESERVATION_DB
+
+note over CUSTOMER, RESERVATION_DB
+  Precondition: the checkout was started as in SEQ-04.
+  The reservation is PENDING and its payment is PENDING with a Wompi transaction identifier.
+end note
+
+WOMPI -> GATEWAY : webhook + X-Event-Checksum
+GATEWAY -> PAYMENT : forward webhook
+PAYMENT -> PAYMENT : verify signature
+
+alt signature invalid
+  PAYMENT -> PAYMENT : log PAYMENT_WEBHOOK_SIGNATURE_INVALID\n(security event, alert raised)
+  PAYMENT --> GATEWAY : 401
+  GATEWAY --> WOMPI : 401
+  note right of PAYMENT
+    The payload is never trusted:
+    no state change, no event.
+  end note
+else signature valid, transaction rejected
+  PAYMENT -> PAYMENT_DB : PENDING → REJECTED\n(a duplicate result changes nothing)
+  PAYMENT -> BUS : publish PaymentRejected v1\n(routing key payment.rejected, with reason)
+  PAYMENT --> GATEWAY : 200
+  GATEWAY --> WOMPI : 200
+
+  BUS -> RESERVATION : deliver PaymentRejected (at-least-once)
+  RESERVATION -> RESERVATION_DB : in one transaction:\n1. insert eventId into processed_events\n2. Reservation.reject(): PENDING → REJECTED
+  note right of RESERVATION_DB
+    The exclusion constraint
+    reservations_no_double_booking only
+    covers PENDING and CONFIRMED rows:
+    the slot is free again with no cleanup job.
+  end note
+end
+
+WOMPI --> CUSTOMER : redirect back to Futbolix
+CUSTOMER -> WEB : /booking/failed
+WEB --> CUSTOMER : rejection reason + "Intentar de nuevo"
+note right of WEB
+  The customer learns the outcome on this
+  screen. PaymentRejected exists to free the
+  court, not to inform anyone.
+end note
+
+@enduml
