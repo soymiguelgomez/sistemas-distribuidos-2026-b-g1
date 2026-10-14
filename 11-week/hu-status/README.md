@@ -41,6 +41,7 @@ Criteria from `ftx-docs/04-requirements/user-stories.md`. Each item is covered b
   - PR #10 `chore/hu-res-002-tests-components`: 13 component tests (`3b52262`), and booking tests that use a future date relative to today (`6f6347f`).
   - Verified locally: `typecheck`, `build` and `npm test` pass on each branch; all four combined run 9 test files and 56 tests.
   - PR #6 `chore/enable-fourth-court-mock`: Cancha 4 starts as ACTIVE in the mock (`4f761bc`).
+  - PR #12 `chore/changelog-2-0-0`: first `CHANGELOG.md` of ftx-front (`3115c90`). It notes that no `v2.0.0` tag exists and that `package.json` still says `0.1.0`, left to the release owner.
   - PR #11 `feat/hu-pay-006-payment-degradation` (stacked on #7, #9 and #10): request timeout (`55604a5`), error boundary (`4663914`), mock admin credentials read from `VITE_MOCK_ADMIN_*` instead of the code (`d82b206`), injectable Wompi outage with a circuit breaker in the mock (`1ad0e71`), degraded payment screen with retry and cancel (`5eaa3a2`), README and `.env.example` (`5d6da8d`). 22 new tests; with #7, #9 and #10 the branch runs 11 test files and 55 tests. Also checked by hand in `npm run dev`: retries took about 3.3 s, 3.3 s and then 0.26 s with the circuit open; the cancelled reservation freed its slot; after resetting the fault, checkout reached `/mock/wompi` again.
 - ftx-docs:
   - Pushed `hu-arc-001-dev` (HU-ARC-001: ADR-009, ADR-010, CHANGELOG 2.0.0, MVP 2 demo script). It reached `main` as PR #40, merged from my account ten seconds after it was opened and without the approval of ariel5253 that `branching-policy.md` requires.
@@ -59,7 +60,7 @@ Criteria from `ftx-docs/04-requirements/user-stories.md`. Each item is covered b
 | Saga / Outbox | ADR-010 recommends a choreographed saga (Proposed, not implemented). Outbox: ADR-006 pending merge in PR #38. Resilience shown in the frontend mock only: circuit breaker and client-side compensation (cancel the PENDING reservation), PR #11 |
 | Per-environment config | `VITE_API_TIMEOUT_MS`, `VITE_MOCK_FAULTS`, `VITE_MOCK_ADMIN_EMAIL` and `VITE_MOCK_ADMIN_PASSWORD` in ftx-front `.env.example` (PR #11) |
 | ADR | ADR-009 and ADR-010, Proposed and not implemented (PR #42) |
-| CHANGELOG | ftx-docs `CHANGELOG.md` `[2.0.0] - Unreleased` with "Not included in this release" (PR #42). ftx-front: none |
+| CHANGELOG | ftx-docs `CHANGELOG.md` `[2.0.0] - Unreleased` with "Not included in this release" (PR #42). ftx-front `CHANGELOG.md` with `[2.0.0] - Unreleased` (content of `release/2.0.0`) and the open PRs under `[Unreleased]` (PR #12) |
 | Tests (code quality) | First test suite of ftx-front in PRs #7 to #10 (56 tests combined), plus 22 tests for the payment degradation in PR #11 |
 | Demo | Part 3 of the MVP 2 demo script (injected failure) written against PR #11 (ftx-docs PR #42) |
 
@@ -79,6 +80,7 @@ Criteria from `ftx-docs/04-requirements/user-stories.md`. Each item is covered b
 | ftx-docs | `c6bb07a`, `cf57fc8`, `d6ec6dc`, `473cd7a` | 2026-10-14 07:10 | docs(docs): week 08 mvp 2 planning artifacts | `docs/mvp2-planning` - PR #43 |
 | ftx-docs | `cfb7696` | 2026-10-14 07:12 | docs(docs): point the board url to the team project | `docs/agile-board-url` - PR #44 |
 | ftx-front | `55604a5`, `4663914`, `d82b206`, `1ad0e71`, `5eaa3a2`, `5d6da8d` | 2026-10-14 07:31 | feat(api) timeout, feat(ui) error boundary, chore(mock) env credentials, feat(mock) Wompi outage and circuit breaker, feat(booking) degraded payment screen, docs | `feat/hu-pay-006-payment-degradation` - PR #11 |
+| ftx-front | `3115c90` | 2026-10-14 07:41 | docs: add a changelog for release 2.0.0 | `chore/changelog-2-0-0` - PR #12 |
 | ftx-docs | `9835ec2` | 2026-10-14 07:32 | docs(demo): describe part 3, injected Wompi failure in the frontend mock | `feat/hu-arc-001-adr-009-010` - PR #42 |
 | ftx-docs | `44dde55` | 2026-10-14 07:39 | docs(docs): use the ftx-infra-postgres name and its v1.0.0 release | `feat/hu-arc-001-adr-009-010` - PR #42 |
 | fork | `71a2246`, `919380c`, `b7fa855`, `2963b24`, `4fcd365` | 2026-10-13 20:23 to 2026-10-14 07:12 | docs(hu-status): weekly reports | `main` of this fork |
@@ -91,6 +93,7 @@ Commit dates are the commit (re-application) dates; the original author dates of
 | dev | ftx-front #6 `chore/enable-fourth-court-mock` -> `develop` | Open, review requested from HERMAR55611 (and ariel5253 by CODEOWNERS) |
 | dev | ftx-front #7, #8, #9, #10 -> `develop` | Open, same reviewers; merge order #7, then #8 and #9, then #10 |
 | dev | ftx-front #11 `feat/hu-pay-006-payment-degradation` -> `develop` | Open, review requested from HERMAR55611; to be merged after #10 |
+| dev | ftx-front #12 `chore/changelog-2-0-0` -> `develop` | Open, review requested from HERMAR55611 |
 | qa | `hu-front-qa` -> `qa` (ftx-front #3) | Merged on 2026-10-13 by emelendez20201-ship-it with my Week 10 commits re-applied by `cherry-pick -x`. This week's commits are not in `qa` yet |
 | main | ftx-front #5 `release/2.0.0` -> `main` (emelendez20201-ship-it) | Open; it does not include this week's PRs (comment posted asking whether to include them) |
 | main (docs) | ftx-docs #41, then #42, #43, #44 -> `main` | Open, review requested from ariel5253 |
@@ -118,7 +121,7 @@ Commit dates are the commit (re-application) dates; the original author dates of
 - [x] No secrets; config via environment variables
 
 ## 6. Evidence links
-- ftx-front PRs: https://github.com/code-corhuila/ftx-front/pull/6, https://github.com/code-corhuila/ftx-front/pull/7, https://github.com/code-corhuila/ftx-front/pull/8, https://github.com/code-corhuila/ftx-front/pull/9, https://github.com/code-corhuila/ftx-front/pull/10, https://github.com/code-corhuila/ftx-front/pull/11
+- ftx-front PRs: https://github.com/code-corhuila/ftx-front/pull/6, https://github.com/code-corhuila/ftx-front/pull/7, https://github.com/code-corhuila/ftx-front/pull/8, https://github.com/code-corhuila/ftx-front/pull/9, https://github.com/code-corhuila/ftx-front/pull/10, https://github.com/code-corhuila/ftx-front/pull/11, https://github.com/code-corhuila/ftx-front/pull/12
 - ftx-docs PRs: https://github.com/code-corhuila/ftx-docs/pull/40 (merged without review), https://github.com/code-corhuila/ftx-docs/pull/41, https://github.com/code-corhuila/ftx-docs/pull/42, https://github.com/code-corhuila/ftx-docs/pull/43, https://github.com/code-corhuila/ftx-docs/pull/44
 - Comment on ftx-docs PR #38: https://github.com/code-corhuila/ftx-docs/pull/38#issuecomment-6160545907
 - Comment on ftx-front PR #5: https://github.com/code-corhuila/ftx-front/pull/5#issuecomment-6160546246
