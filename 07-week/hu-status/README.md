@@ -53,13 +53,13 @@
 ### Pull requests and flow
 | PR | Branch -> target | Merged | Merge commit |
 |---|---|---|---|
-| ftx-docs #4 | head `e9750ed` | No. Same 10-devops content as `1423ea4`, which went in through PR #6 | - |
-| ftx-docs #6 | `dev` -> `main` | 2026-09-17, by Dannamo34 | `724332b` |
-| ftx-docs #15 | `docs/update-10-environments.md` -> `main` | 2026-09-29 (Week 09), by soymiguelgomez | `50ecaa9` |
-| ftx-docs #16 | `docs/update-10-local-setup` -> `main` | 2026-09-27 (Week 08), by Dannamo34 | `82d8676` |
-| ftx-docs #17 | `docs/update-10-readme` -> `main` | 2026-09-29 (Week 09), by soymiguelgomez | `c0e9d23` |
+| ftx-docs #4 | `soymiguelgomez-patch-1` -> `dev` (head `e9750ed`) | No, closed. Approved by ariel5253 on 2026-09-17 09:14; the same 10-devops content went in through PR #6 (`1423ea4`) | - |
+| ftx-docs #6 | `dev` -> `main` | 2026-09-17, by Dannamo34; approved by ariel5253 on 2026-09-17 | `724332b` |
+| ftx-docs #15 | `docs/update-10-environments.md` -> `main` | 2026-09-29 (Week 09), by soymiguelgomez; approved by ariel5253 on 2026-09-19 13:08 | `50ecaa9` |
+| ftx-docs #16 | `docs/update-10-local-setup` -> `main` | 2026-09-27 (Week 08), by Dannamo34; approved by ariel5253 on 2026-09-19 13:09 | `82d8676` |
+| ftx-docs #17 | `docs/update-10-readme` -> `main` | 2026-09-29 (Week 09), by soymiguelgomez; approved by ariel5253 on 2026-09-19 20:26 | `c0e9d23` |
 
-- Flow `hu-xxx-dev -> develop -> qa -> main`: **not applicable** to ftx-docs. Per `00-governance/branching-policy.md`, the documentation repository has one permanent branch, `main`, fed by a child branch and a PR. All my PRs targeted `main`; nothing went through `develop` or `qa`.
+- Flow `hu-xxx-dev -> develop -> qa -> main`: **not applicable** to ftx-docs. Per `00-governance/branching-policy.md`, the documentation repository has one permanent branch, `main`, fed by a child branch and a PR with "1 approval · ariel5253". PRs #6, #15, #16 and #17 followed that rule: each one has an approval from ariel5253 before its merge (links in section 6). PR #4 targeted `dev` and was closed.
 
 ## 3. Blockers and risks
 - All five commits carry the GitHub web uploader message `Add files via upload`, which does not follow Conventional Commits.
@@ -82,6 +82,7 @@
 - PR #15: https://github.com/code-corhuila/ftx-docs/pull/15 - commit https://github.com/code-corhuila/ftx-docs/commit/4e9746b5f86673637fbe30d611ac7dbbcd70cc78
 - PR #16: https://github.com/code-corhuila/ftx-docs/pull/16 - commit https://github.com/code-corhuila/ftx-docs/commit/4ab6938fbd16e909da5f08bb03592993a97e3773
 - PR #17: https://github.com/code-corhuila/ftx-docs/pull/17 - commit https://github.com/code-corhuila/ftx-docs/commit/2b6fb9c5e76d934ee1da5f5c3bc0e0c4def0e09b
-- PR #4 (not merged): https://github.com/code-corhuila/ftx-docs/pull/4
+- PR #4 (closed, not merged): https://github.com/code-corhuila/ftx-docs/pull/4
+- Approvals by ariel5253: https://github.com/code-corhuila/ftx-docs/pull/6#pullrequestreview-5240905724, https://github.com/code-corhuila/ftx-docs/pull/15#pullrequestreview-5256924272, https://github.com/code-corhuila/ftx-docs/pull/16#pullrequestreview-5256929885, https://github.com/code-corhuila/ftx-docs/pull/17#pullrequestreview-5258779726
 - Environments document: https://github.com/code-corhuila/ftx-docs/blob/main/10-devops/environments.md
 - Self-check notes: the commits are `Add files via upload` (not Conventional Commits); the branches are `dev` / `docs/...`, not HU branches; no user story or tests are involved; there is no code, so DDD does not apply; `environments.md` keeps secrets out of the repository (placeholders only in `.env.example`, real values in the environment).

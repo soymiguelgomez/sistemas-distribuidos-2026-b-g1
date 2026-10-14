@@ -65,14 +65,15 @@ Note on "ADR-005/006/007 pending": in Week 08 the ADR register in ftx-docs `main
 ### Pull requests and flow
 | PR | Branch -> target | Merged | Merge commit |
 |---|---|---|---|
-| ftx-docs #29 | `docs/payment-contract` -> `main` | 2026-09-27, by Dannamo34 | `47caa44` |
-| ftx-docs #30 | `docs(payment)-add-payment-sequence-and-state-diagrams` -> `main` | 2026-09-27, by Dannamo34 | `fd8b73f` |
-| ftx-docs #16 (from Week 07) | `docs/update-10-local-setup` -> `main` | 2026-09-27, by Dannamo34 | `82d8676` |
-| ftx-schedules-db #1 | `chore/schedules-db-baseline` -> `develop` | No, still open on 2026-10-13 | - |
+| ftx-docs #29 | `docs/payment-contract` -> `main` | 2026-09-27, by Dannamo34; approved by ariel5253 on 2026-09-23 20:34 | `47caa44` |
+| ftx-docs #30 | `docs(payment)-add-payment-sequence-and-state-diagrams` -> `main` | 2026-09-27, by Dannamo34; approved by ariel5253 on 2026-09-23 20:35 | `fd8b73f` |
+| ftx-docs #16 (from Week 07) | `docs/update-10-local-setup` -> `main` | 2026-09-27, by Dannamo34; approved by ariel5253 on 2026-09-19 | `82d8676` |
+| ftx-schedules-db #1 | `chore/schedules-db-baseline` -> `develop` | No, still open on 2026-10-14 (approved by ariel5253 on 2026-09-27 17:48; now conflicts with `develop`) | - |
 | (none) | `docs/reconcile-environments-and-ci-cd` | No PR opened | - |
 | (none) | `docs/local-setup-wsl2-and-renames` | No PR opened | - |
 
-- ftx-docs: the flow `hu-xxx-dev -> develop -> qa -> main` does **not apply**. Per `00-governance/branching-policy.md`, the documentation repository only has `main`, fed by a child branch and a PR.
+- ftx-docs: the flow `hu-xxx-dev -> develop -> qa -> main` does **not apply**. Per `00-governance/branching-policy.md`, the documentation repository only has `main`, fed by a child branch and a PR with "1 approval · ariel5253". PRs #29 and #30 were approved by ariel5253 before their merge (links in section 6).
+- ftx-schedules-db: the design of this branch reached `main` later through HU-ADM-001 (HERMAR55611, tag `v2.0.0`, 2026-10-13). The README on `main` says: "The table design, the court-id contract and the first checks come from the baseline branch `chore/schedules-db-baseline` by Miguel Gómez."
 - ftx-schedules-db: PR #1 targets `develop` from a `chore/` branch, not from a `hu-xxx-dev` branch. It was never promoted to `qa` or `main`.
 
 ## 3. Blockers and risks
@@ -100,6 +101,8 @@ Note on "ADR-005/006/007 pending": in Week 08 the ADR register in ftx-docs `main
 - Reconcile environments (no PR): https://github.com/code-corhuila/ftx-docs/tree/docs/reconcile-environments-and-ci-cd
 - Local setup WSL2 (no PR): https://github.com/code-corhuila/ftx-docs/tree/docs/local-setup-wsl2-and-renames
 - ftx-schedules-db PR #1: https://github.com/code-corhuila/ftx-schedules-db/pull/1 - commit https://github.com/code-corhuila/ftx-schedules-db/commit/7603eabc36e5867efe7bd4f67414ed1051bc9a19
+- Approvals by ariel5253: https://github.com/code-corhuila/ftx-docs/pull/29#pullrequestreview-5298691743, https://github.com/code-corhuila/ftx-docs/pull/30#pullrequestreview-5298695802, https://github.com/code-corhuila/ftx-schedules-db/pull/1#pullrequestreview-5332497440
+- Credit on ftx-schedules-db `main` (README, "Credits"): https://github.com/code-corhuila/ftx-schedules-db/blob/main/README.md
 - Fork commits: https://github.com/soymiguelgomez/sistemas-distribuidos-2026-b-g1/commit/a38a1d803019f84f57ce74c50be34f72057da5c1, https://github.com/soymiguelgomez/sistemas-distribuidos-2026-b-g1/commit/62d286a19850658ba527ce9a73147e936ac7476f, https://github.com/soymiguelgomez/sistemas-distribuidos-2026-b-g1/commit/067b2e6f5fe616552706d90479bff056c78d2119
 - Session material: https://code-corhuila.github.io/ova-web/2026-B/distribuidos/08-week/02-session/
 - Self-check notes: 1 of 8 commits does not follow Conventional Commits (`ocs:`); the branches are `docs/...` and `chore/...`, not HU branches; the HU-ARC-002 / HU-PAY-003 / HU-PAY-004 definitions are not in the repository; no tests; no code, so DDD does not apply; the contract keeps the Wompi webhook secret inside payment-service, `environments.md` loads it from the environment (`APP_PAYMENT_WOMPI_EVENTS_SECRET`), and ftx-schedules-db reads its database settings from `.env` with placeholders in `.env.example`.

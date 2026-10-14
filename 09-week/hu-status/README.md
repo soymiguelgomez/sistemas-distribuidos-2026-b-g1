@@ -73,11 +73,11 @@
 ### Pull requests and flow
 | PR | Branch -> target | Merged | Merge commit |
 |---|---|---|---|
-| ftx-schedules-db #1 (opened in Week 08) | `chore/schedules-db-baseline` -> `develop` | No, still open on 2026-10-13 | - |
-| ftx-docs #33 | `docs/product-backlog-architecture-ux` -> `main` | 2026-09-29, by soymiguelgomez | `7883a73` |
-| ftx-docs #15 | `docs/update-10-environments.md` -> `main` | 2026-09-29, by soymiguelgomez | `50ecaa9` |
-| ftx-docs #17 | `docs/update-10-readme` -> `main` | 2026-09-29, by soymiguelgomez | `c0e9d23` |
-| ftx-docs #35 | `docs/overview-trailing-line` | Not merged as of 2026-10-13 | - |
+| ftx-schedules-db #1 (opened in Week 08) | `chore/schedules-db-baseline` -> `develop` | No, still open on 2026-10-14; approved by ariel5253 on 2026-09-28 at 08:52 and 09:29; it now conflicts with `develop` | - |
+| ftx-docs #33 | `docs/product-backlog-architecture-ux` -> `main` | 2026-09-29, by soymiguelgomez; approved by ariel5253 on 2026-09-28 10:51 | `7883a73` |
+| ftx-docs #15 | `docs/update-10-environments.md` -> `main` | 2026-09-29, by soymiguelgomez; approved by ariel5253 on 2026-09-19 13:08 | `50ecaa9` |
+| ftx-docs #17 | `docs/update-10-readme` -> `main` | 2026-09-29, by soymiguelgomez; approved by ariel5253 on 2026-09-19 20:26 | `c0e9d23` |
+| ftx-docs #35 | `docs/overview-trailing-line` -> `main` | Not merged as of 2026-10-14; approved by ariel5253 on 2026-09-29 20:47 | - |
 | (none) | `revert-33-docs/product-backlog-architecture-ux` | No PR opened | - |
 
 - ftx-docs: the flow `hu-xxx-dev -> develop -> qa -> main` does **not apply**. Per `00-governance/branching-policy.md`, the documentation repository only has `main`, fed by a child branch and a PR.
@@ -88,7 +88,7 @@
 - ftx-schedules-db: the README of the branch describes `.github/workflows/migrations.yml`, but that file was deleted and not added again, so the checks do not run in CI.
 - PR #35 is not merged; `overview.md` on `main` still ends with the trailing blank line.
 - The revert branch for PR #33 was left without a PR. It should be deleted, or a PR opened if the change really has to be undone.
-- I merged PRs #33, #15 and #17 myself. `branching-policy.md` requires 1 approval from `ariel5253` to merge into `main`; the approvals are not visible from git history.
+- I merged PRs #33, #15 and #17 myself, after each one was approved by ariel5253, as `branching-policy.md` requires for `main` (links in section 6). PR #35 is approved but still not merged.
 
 ## 4. Plan for next week
 - Week 10 (as executed, see `10-week/hu-status`): build the React + Vite web frontend in ftx-front against the ftx-docs OpenAPI contracts and open the PR to `develop`.
@@ -109,4 +109,6 @@
 - PR #17 merge: https://github.com/code-corhuila/ftx-docs/commit/c0e9d231be5a88bc9173c5ecde62e750c2c056e7
 - PR #35: https://github.com/code-corhuila/ftx-docs/pull/35 - commit https://github.com/code-corhuila/ftx-docs/commit/5adf9035127e99af3d2f042790e1a2a819a40e30
 - Revert commit (no PR): https://github.com/code-corhuila/ftx-docs/commit/7a7ef6f10da3bdc004f7713f1858ebfd377f29a4
+- Approvals by ariel5253: https://github.com/code-corhuila/ftx-docs/pull/33#pullrequestreview-5341228766, https://github.com/code-corhuila/ftx-docs/pull/35#pullrequestreview-5360538049, https://github.com/code-corhuila/ftx-schedules-db/pull/1#pullrequestreview-5340138792
+- Credit on ftx-schedules-db `main` (README, "Credits": "The table design, the court-id contract and the first checks come from the baseline branch `chore/schedules-db-baseline` by Miguel Gómez."): https://github.com/code-corhuila/ftx-schedules-db/blob/main/README.md
 - Self-check notes: the ftx-docs commits follow `type: summary`, but 11 of the 13 ftx-schedules-db commits do not. The branches are `docs/...` and `chore/...`, not HU branches. No user story is involved. Tests: `tests/verify.sql` holds 8 SQL post-migration checks, although the CI file that ran them was deleted. There is no application code, so DDD does not apply. ftx-schedules-db reads its database settings from `.env`, with placeholders in `.env.example`.

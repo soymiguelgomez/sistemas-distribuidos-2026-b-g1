@@ -69,7 +69,7 @@ Criteria from `ftx-docs/04-requirements/user-stories.md`. The services own these
 - The frontend has only run against the browser mock; no microservice or API Gateway was available to test against.
 - No automated tests: `package.json` only has `typecheck` and `build` (`tsc --noEmit && vite build`).
 - The mock contains a demo administrator login (`src/api/mock/constants.ts`). It only works inside the browser mock, but it is a password string in the source.
-- I merged PR #1 myself; peer review is not visible from git history.
+- PR #1 has no review: I opened it at 09:12 and merged it myself at 09:14 on 2026-10-05. `branching-policy.md` leaves the review rule on `develop` to the team, but no teammate reviewed this change.
 - The `develop` branch name for PR #1 is `feat/web-frontend` (allowed for `develop` by `ftx-docs/00-governance/branching-policy.md`), not the `hu-xxx-dev` name used in the course README.
 
 ## 4. Plan for next week
@@ -93,4 +93,5 @@ Criteria from `ftx-docs/04-requirements/user-stories.md`. The services own these
 - `2b900a7`: https://github.com/code-corhuila/ftx-front/commit/2b900a70feafa943da2e3a0fd2168ac0ae615c61
 - Merge into develop: https://github.com/code-corhuila/ftx-front/commit/d2a26fca2ee6eab072fa0c0d4fd2c135eab79823
 - qa branch (Week 11): https://github.com/code-corhuila/ftx-front/tree/hu-front-qa
+- Promotion to qa (Week 11, by emelendez20201-ship-it): https://github.com/code-corhuila/ftx-front/pull/3 - re-applied commits with the `cherry-pick -x` trail: https://github.com/code-corhuila/ftx-front/commit/6f192fb44591795d299e6a10ebf2f911bd7e080d, https://github.com/code-corhuila/ftx-front/commit/2c91da1783501fc9d697fb9963bba7f735826129, https://github.com/code-corhuila/ftx-front/commit/944f75c3ce65245678ec9df49f4c972f7b1a73ca
 - Self-check notes: all three commits use `type(scope): summary`. PR #1 went to `develop` from `feat/web-frontend`, not from a `hu-xxx-dev` branch, and was not promoted to `qa` or `main` this week. The stories have Given/When/Then criteria in `04-requirements/user-stories.md`. There are no tests. The frontend has no DDD domain layer to evaluate. Configuration comes from `VITE_*` environment variables with no real secret; the only credential is the mock-only demo login noted in section 3.
