@@ -15,8 +15,8 @@
 | HU ID | Title | Status (todo/doing/done) | Evidence (PR or commit URL) |
 |---|---|---|---|
 | HU-RES-002 | Create Field Reservation - reject start times before the current business time (America/Bogota) | doing | https://github.com/code-corhuila/ftx-front/pull/8 |
-| HU-RES-002 / HU-RES-004 / HU-ADM-001 | Frontend test setup, API client tests and component tests (409 slot conflict, 404 lookup by code, admin route guard) | doing | https://github.com/code-corhuila/ftx-front/pull/7 |
-| HU-PAY-006 | Fail Fast When Wompi Is Unavailable - simulated in the frontend mock: request timeout, injectable Wompi outage, circuit breaker, degraded payment screen with retry and cancel | doing | https://github.com/code-corhuila/ftx-front/pull/14 |
+| HU-RES-002 / HU-RES-004 / HU-ADM-001 | Frontend test setup and API client tests (merged, PRs #7 and #9); component tests for the 409 slot conflict, 404 lookup by code and admin route guard (PR #10, approved by ariel5253, not merged) | doing | https://github.com/code-corhuila/ftx-front/pull/7 |
+| HU-PAY-006 | Fail Fast When Wompi Is Unavailable - frontend part, simulated in the mock: request timeout, injectable Wompi outage, circuit breaker, degraded payment screen with retry and cancel. Merged into `develop` | done | https://github.com/code-corhuila/ftx-front/pull/14 |
 | HU-ARC-001 | Record ADR-009 and ADR-010 (ftx-docs) | doing | https://github.com/code-corhuila/ftx-docs/pull/45 |
 | N/A (no HU ID) | Revert of PR #40, merged into ftx-docs `main` without the required approval | doing | https://github.com/code-corhuila/ftx-docs/pull/41 |
 | N/A (no HU ID) | MVP 2 demo script Part 3 (injected failure) and the `ftx-infra-postgres` rename | doing | https://github.com/code-corhuila/ftx-docs/pull/46 |
@@ -27,7 +27,7 @@
 | N/A (no HU ID) | Board URL in `agile-conventions.md` points to the team project | doing | https://github.com/code-corhuila/ftx-docs/pull/44 |
 | N/A (no HU ID) | Mock data: fourth court bookable | doing | https://github.com/code-corhuila/ftx-front/pull/6 |
 
-All rows are "doing": every PR is open and waiting for review (status on 2026-10-14). Nothing of this week is merged in `develop`, `qa` or `main`.
+Status on 2026-10-14 (afternoon): HERMAR55611 approved and merged ftx-front #7, #9 and #14 into `develop`; on that commit (`29f1767`) `npm run typecheck`, `npm test` (6 files, 40 tests) and `npm run build` pass. ariel5253 approved every other open PR listed here; they are not merged yet, so those rows stay "doing". Nothing of this week is in `qa` or `main`. HU-PAY-006 is "done" only for its frontend part: the real circuit breaker belongs to `payment-service`, which has no code.
 
 ### Acceptance criteria met
 Criteria from `ftx-docs/04-requirements/user-stories.md`. Each item is covered by an automated test in the open PRs, run against a stubbed gateway or the browser mock, not against real services:
@@ -98,6 +98,7 @@ Criteria from `ftx-docs/04-requirements/user-stories.md`. Each item is covered b
 | ftx-front | `6f673ff` | 2026-10-14 08:07 | docs(web): document the injected wompi failure and its env variables | `feat/hu-pay-006-wompi-unavailable` - PR #14 |
 | ftx-front | `4b8e3e2` | 2026-10-14 08:08 | feat(web): add an error boundary around the app | `feat/web-error-boundary` - PR #15 |
 | ftx-front | `216fcf6` | 2026-10-14 08:09 | docs(web): add a changelog for release 2.0.0 | `chore/changelog-release-2-0-0` - PR #16 |
+| ftx-front | `7c6406f` | 2026-10-14 15:09 | docs(web): list the pull requests merged into develop in the changelog | `chore/changelog-release-2-0-0` - PR #16 |
 | ftx-docs | `257af43` | 2026-10-14 14:18 | docs(docs): reference adr-003 to adr-007 as accepted after prs #37 and #38 | `docs/hu-arc-001-adr-009-010` - PR #45 |
 | ftx-docs | `26a6cd3` | 2026-10-14 14:18 | docs(docs): describe part 3 of the demo, injected wompi failure in the frontend mock | `docs/demo-part-3-infra-rename` - PR #46 |
 | ftx-docs | `0e8df6c` | 2026-10-14 14:18 | docs(docs): use the ftx-infra-postgres name and its v1.0.0 release (`cherry-pick -x` of `44dde55`) | `docs/demo-part-3-infra-rename` - PR #46 |
@@ -108,26 +109,25 @@ Commit dates are the commit (re-application) dates; the original author dates of
 ### Pull requests and flow
 | Stage | Branch -> target | Status |
 |---|---|---|
-| dev | ftx-front #6 `chore/enable-fourth-court-mock` -> `develop` | Open, review requested from HERMAR55611 (and ariel5253 by CODEOWNERS) |
-| dev | ftx-front #7, #8, #9, #10 -> `develop` | Open, same reviewers; merge order #7, then #8 and #9, then #10 |
-| dev | ftx-front #13 (from `develop`), #14 (after #7 and #9), #15 (after #7), #16 (from `develop`) -> `develop` | Open, review requested from HERMAR55611 and ariel5253 |
+| dev | ftx-front #7, #9, #14 -> `develop` | **Merged** on 2026-10-14 by HERMAR55611, approved by HERMAR55611 and ariel5253 |
+| dev | ftx-front #6, #8, #10, #13, #16 -> `develop` | Approved by ariel5253, review from HERMAR55611 pending; no conflicts with the new `develop` (checked with `git merge-tree`) |
+| dev | ftx-front #15 -> `develop` | Approved by ariel5253; HERMAR55611 commented "LGTM. Error boundary reviewed by tech lead"; not merged |
 | dev | ftx-front #11 and #12 -> `develop` | Closed on 2026-10-14 with a comment linking their replacements |
 | qa | `hu-front-qa` -> `qa` (ftx-front #3) | Merged on 2026-10-13 by emelendez20201-ship-it with my Week 10 commits re-applied by `cherry-pick -x`. This week's commits are not in `qa` yet |
-| main | ftx-front #5 `release/2.0.0` -> `main` (emelendez20201-ship-it) | Open; it does not include this week's PRs (comment posted asking whether to include them) |
-| main (docs) | ftx-docs #41, then #45, then #46; also #43 and #44 -> `main` | Open, review requested from ariel5253. #42 closed on 2026-10-14, replaced by #45 and #46 |
+| main | ftx-front #5 `release/2.0.0` -> `main` (emelendez20201-ship-it) | Approved by ariel5253, not merged; it does not include this week's PRs. No `v2.0.0` tag in ftx-front |
+| main (docs) | ftx-docs #41, then #45, then #46; also #43 and #44 -> `main` | Approved by ariel5253 on 2026-10-14, not merged yet. #42 closed on 2026-10-14, replaced by #45 and #46 |
 
 ## 3. Blockers and risks
 - PR #40 in ftx-docs was merged into `main` from my account without review; `main` of ftx-docs has no branch protection (private repository; the protection API answers 403 on this plan). Correction in PRs #41 and #45.
 - In the Week 08 files HU-ARC-001 means "ADR-005, ADR-006, ADR-007", while PR #45 uses it for "Record ADR-009 and ADR-010". The Product Owner must choose the IDs.
-- PRs #14, #15 and #46 are stacked on other open PRs (#7/#9, #7 and #45) because they need their files; they list those commits until the base PRs are merged.
+- PR #46 is stacked on #45 because it edits files that #45 creates; it must be merged after #41 and #45. (#14 and #15 were stacked on #7/#9; #7, #9 and #14 are now merged.)
 - The ADR register of ftx-docs still lists ADR-003 to ADR-007 as not filed or pending, although #37 and #38 added them as Accepted (not changed by me; noted in the changelog of #45).
-- PR #7 alone leaves `npm test` with exit code 1 ("No test files found") until PR #8 or #9 is merged.
 - `npm audit` reports advisories in Vitest 3's dev-only dependencies (`tinypool`, `@vitest/mocker`); the full fix needs Vitest 4.
 - HU-PAY-006 is shown only in the browser mock: there is no `payment-service` (no repository and no code), so the real circuit breaker, the saga and the outbox are not implemented in any repository.
 - Docker is not installed on my machine: the nginx image and Part 1 of the demo script have not been run.
 
 ## 4. Plan for next week
-- Address review comments on ftx-front #6 to #10 and #13 to #16, and ftx-docs #41, #43 to #46; after merge, promote the frontend changes to `qa` with `cherry-pick -x`.
+- Get the approved PRs merged (ftx-front #6, #8, #10, #13, #15, #16; ftx-docs #41, #45, #46, #43, #44) and promote the frontend changes to `qa` with `cherry-pick -x`.
 - Get an answer on the contract copies (Tech Lead and instructor) and, if allowed, open the contract-tests PR.
 - Rehearse Part 3 of the demo script (injected Wompi failure) with the team.
 - Configure weekly Sprint iterations in the team board (Project #20) with the team.
