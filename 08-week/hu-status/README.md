@@ -17,6 +17,7 @@
 | HU-ARC-002 | API Review of the proposed payment-service contract | doing | https://github.com/code-corhuila/ftx-docs/pull/29 |
 | HU-PAY-003 | Start the Wompi Sandbox checkout - contract and sequence only, no implementation | todo | https://github.com/code-corhuila/ftx-docs/pull/29 |
 | HU-PAY-004 | Apply the Wompi payment result - contract and diagrams only, no implementation | todo | https://github.com/code-corhuila/ftx-docs/pull/30 |
+| N/A (no HU ID) | MVP 2 planning: story map, planning-poker estimates, 18 SP commitment, 11 split stories, dependencies, risks and open questions (written 2026-09-23, published 2026-10-14) | doing | https://github.com/code-corhuila/ftx-docs/pull/43 |
 | N/A (no HU ID) | ADR-005/006/007 pending | todo | N/A |
 | N/A (no HU ID) | ftx-schedules-db: first files of the schedules database repository | doing | https://github.com/code-corhuila/ftx-schedules-db/pull/1 |
 | N/A (no HU ID) | 10-devops: reconcile `environments.md` with the branching policy and restore `ci-cd.md` | doing | https://github.com/code-corhuila/ftx-docs/commit/534dbd3545802257b6fed04a156ba8e59e073c9e |
@@ -25,7 +26,8 @@
 Note on "ADR-005/006/007 pending": in Week 08 the ADR register in ftx-docs `main` listed ADR-005 (reservation and payment consistency), ADR-006 (outbox) and ADR-007 (reservation lookup) as pending decisions, and the payment contract depends on them. I did not write them. They were later drafted by Dannamo34 in ftx-docs PR #38 (2026-10-06), which is not merged.
 
 ### Acceptance criteria met
-- HU-ARC-002, HU-PAY-003 and HU-PAY-004 are referenced in my contract and diagrams, but their story definitions are not in any ftx-docs branch (checked on 2026-10-13), so I cannot check criteria against them.
+- HU-PAY-003 and HU-PAY-004 are defined, with Given/When/Then criteria, in the `04-requirements/user-stories.md` I wrote this week (2026-09-23). That file was published only on 2026-10-14, in ftx-docs PR #43, which is not merged; `main` still has the six original stories. HU-ARC-002 appears only as an enabler in `03-product/product-backlog.md` of the same PR. Nothing of these stories was implemented, so no criterion is met in running code.
+- Note: in the Week 08 files HU-ARC-001 means "ADR-005, ADR-006, ADR-007"; PR #42 later used HU-ARC-001 for "Record ADR-009 and ADR-010". The Product Owner has to choose the final IDs.
 - The closest defined story is HU-PAY-001 (`04-requirements/user-stories.md` on `main`). This week I **specified** its criteria in the contract and diagrams. Nothing was implemented, so none of them is met in running code:
   - AC1 Initiate payment -> `POST /payments/checkouts` (public, `Idempotency-Key` required) and the "Start the checkout" block of SEQ-04.
   - AC2 Approved payment -> SEQ-04: `PENDING -> APPROVED`, `PaymentApproved v1` published, reservation `PENDING -> CONFIRMED`.
@@ -33,8 +35,9 @@ Note on "ADR-005/006/007 pending": in Week 08 the ADR register in ftx-docs `main
   - AC4 Payment association -> payment looked up by reservation code; unique `wompi_transaction_id`, so a duplicate result changes nothing.
 
 ## 2. My individual contribution
+- MVP 2 planning (Week 08 · Session 2, 2026-09-23): wrote the story map with release rows, split HU-PAY-001, HU-RES-003 and HU-ADM-001 into ten sprint-sized stories and added HU-RES-006 (outbox, from technical debt AT-004), proposed planning-poker estimates and an 18 SP commitment for W09 + W10 against a proposed 10 SP/sprint capacity, and recorded dependencies, risks R-001 to R-007 and open questions. These files stayed on my machine and were published unchanged on 2026-10-14 in ftx-docs PR #43 (`docs/mvp2-planning`, commits `c6bb07a`, `cf57fc8`, `d6ec6dc`, `473cd7a`).
 - Wrote the contract-first draft `07-api/contracts/openapi/payment-service.yaml` (OpenAPI 3.0.3, status "Proposed - pending API Review"): `GET /health`, `POST /payments/checkouts`, `POST /payments/wompi/webhook` verified by `X-Event-Checksum`. It lists open points Q-002 (webhook path), Q-011 (reservation key) and ADR-007 (reservation code format). Commit `21fc087`, PR #29, merged into `main`.
-- Added the PlantUML sources for SEQ-04 (approved payment), SEQ-08 (rejected payment and invalid signature) and ST-02 (payment lifecycle `PENDING -> APPROVED / REJECTED -> REFUNDED`) in `08-uml/diagrams/source/`. Commit `02aec66`, PR #30, merged into `main`. The commit message mentions rendered SVGs, but the commit only contains the three `.puml` files.
+- Added the PlantUML sources for SEQ-04 (approved payment), SEQ-08 (rejected payment and invalid signature) and ST-02 (payment lifecycle `PENDING -> APPROVED / REJECTED -> REFUNDED`) in `08-uml/diagrams/source/`. Commit `02aec66`, PR #30, merged into `main`. The commit message mentions rendered SVGs, but the commit only contains the three `.puml` files; the SVGs were published on 2026-10-14 in PR #43.
 - Reconciled `10-devops/environments.md` with `00-governance/branching-policy.md`. The one rule not taken verbatim from the policy is labeled as a proposal pending Tech Lead approval. Also restored `10-devops/ci-cd.md`, which `10-devops/README.md` requires (`534dbd3`, branch only, no PR).
 - Renamed the `local-setup.md` tool sections and added a Windows/WSL2 + Testcontainers note (`35a8d29`, branch only, no PR).
 - ftx-schedules-db: on 2026-09-27 pushed `7603eab` to branch `chore/schedules-db-baseline` (`.env.example`, `.gitignore`, `Dockerfile`, `docker-compose.yml`, README) and opened PR #1 to `develop`, titled "hu-001-dev". The commit message says "add schema, seed and migration CI", but the commit has no schema, seed or CI file; those came in Week 09.
@@ -80,7 +83,7 @@ Note on "ADR-005/006/007 pending": in Week 08 the ADR register in ftx-docs `main
 - Commit `534dbd3` has a typo in its type (`ocs:` instead of `docs:`). `21fc087` says "payment diagrams" but only adds the OpenAPI contract, and `7603eab` says "schema, seed and migration CI" but adds none of them.
 - `534dbd3` and `35a8d29` were pushed without a PR, so the reconciled `environments.md` and `ci-cd.md` are not in `main`.
 - The contract is blocked by open points Q-002 (webhook path), Q-011 (`ReservationCreated` v1 does not carry the reservation code) and ADR-007 (code format). ADR-005 must define what happens to a payment result for a reservation that is no longer PENDING.
-- The Week 08 report I submitted on 2026-09-23 linked a `docs/mvp2-planning` branch (story map, split stories, dependencies, open questions). That branch is not on the remote (checked on 2026-10-13), and none of those files appears in any ftx-docs branch with me as author, so that work is not counted here.
+- The Week 08 report I submitted on 2026-09-23 linked a `docs/mvp2-planning` branch (story map, split stories, dependencies, open questions) that I never pushed. The files, dated 2026-09-23 on my machine, were published unchanged on 2026-10-14 in ftx-docs PR #43; the commit dates are the publication dates.
 
 ## 4. Plan for next week
 - Week 09 (as executed, see `09-week/hu-status`): align the architecture overview's error format and health checks with the API contracts, merge my pending 10-devops PRs (#15, #17), and add the schema, seed and checks to ftx-schedules-db PR #1.
@@ -88,7 +91,7 @@ Note on "ADR-005/006/007 pending": in Week 08 the ADR register in ftx-docs `main
 ## 5. Compliance self-check
 - [ ] Conventional Commits - `type(scope): summary`
 - [ ] Per-environment HU branch + PR to that environment (hu-xxx-dev -> develop, ...)
-- [ ] Testable acceptance criteria
+- [x] Testable acceptance criteria
 - [ ] Tests added/updated (unit / integration)
 - [ ] DDD / hexagonal boundaries respected (domain has no I/O)
 - [x] No secrets; config via environment variables
@@ -104,5 +107,6 @@ Note on "ADR-005/006/007 pending": in Week 08 the ADR register in ftx-docs `main
 - Approvals by ariel5253: https://github.com/code-corhuila/ftx-docs/pull/29#pullrequestreview-5298691743, https://github.com/code-corhuila/ftx-docs/pull/30#pullrequestreview-5298695802, https://github.com/code-corhuila/ftx-schedules-db/pull/1#pullrequestreview-5332497440
 - Credit on ftx-schedules-db `main` (README, "Credits"): https://github.com/code-corhuila/ftx-schedules-db/blob/main/README.md
 - Fork commits: https://github.com/soymiguelgomez/sistemas-distribuidos-2026-b-g1/commit/a38a1d803019f84f57ce74c50be34f72057da5c1, https://github.com/soymiguelgomez/sistemas-distribuidos-2026-b-g1/commit/62d286a19850658ba527ce9a73147e936ac7476f, https://github.com/soymiguelgomez/sistemas-distribuidos-2026-b-g1/commit/067b2e6f5fe616552706d90479bff056c78d2119
+- MVP 2 planning artifacts (written 2026-09-23, published 2026-10-14): https://github.com/code-corhuila/ftx-docs/pull/43 - story map and commitment: https://github.com/code-corhuila/ftx-docs/blob/docs/mvp2-planning/03-product/product-backlog.md - split stories: https://github.com/code-corhuila/ftx-docs/blob/docs/mvp2-planning/04-requirements/user-stories.md - dependencies: https://github.com/code-corhuila/ftx-docs/blob/docs/mvp2-planning/15-project-control/dependencies.md - risks: https://github.com/code-corhuila/ftx-docs/blob/docs/mvp2-planning/15-project-control/risks.md
 - Session material: https://code-corhuila.github.io/ova-web/2026-B/distribuidos/08-week/02-session/
-- Self-check notes: 1 of 8 commits does not follow Conventional Commits (`ocs:`); the branches are `docs/...` and `chore/...`, not HU branches; the HU-ARC-002 / HU-PAY-003 / HU-PAY-004 definitions are not in the repository; no tests; no code, so DDD does not apply; the contract keeps the Wompi webhook secret inside payment-service, `environments.md` loads it from the environment (`APP_PAYMENT_WOMPI_EVENTS_SECRET`), and ftx-schedules-db reads its database settings from `.env` with placeholders in `.env.example`.
+- Self-check notes: 1 of 8 commits does not follow Conventional Commits (`ocs:`); the branches are `docs/...` and `chore/...`, not HU branches; the 11 split stories written this week (HU-PAY-003 and HU-PAY-004 among them) have Given/When/Then criteria, published on 2026-10-14 in PR #43 and not merged yet; no tests; no code, so DDD does not apply; the contract keeps the Wompi webhook secret inside payment-service, `environments.md` loads it from the environment (`APP_PAYMENT_WOMPI_EVENTS_SECRET`), and ftx-schedules-db reads its database settings from `.env` with placeholders in `.env.example`.
