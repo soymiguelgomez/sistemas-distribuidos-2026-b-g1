@@ -55,13 +55,15 @@ Criteria from `ftx-docs/04-requirements/user-stories.md`. The services own these
 | ftx-front | `2b900a7` | 2026-10-05 09:07 | chore(web): add package-lock.json | `feat/web-frontend` - PR #1 |
 | ftx-front | `d2a26fc` | 2026-10-05 09:14 | Merge pull request #1 from code-corhuila/feat/web-frontend | merge into `develop` |
 | ftx-docs | - | - | No commits this week | - |
+| ftx-schedules-db | - | - | No commits this week | - |
+| fork | - | - | No commits this week | - |
 
 ### Pull requests and flow
 | Stage | Branch -> target | Status | Commit |
 |---|---|---|---|
 | dev | `feat/web-frontend` -> `develop` (PR #1) | Merged 2026-10-05 by soymiguelgomez | `d2a26fc` |
-| qa | `hu-front-qa` -> `qa` | Not in Week 10. On 2026-10-13 (Week 11) emelendez20201-ship-it created `hu-front-qa` from `qa` with my three commits re-applied by `cherry-pick -x` (`6f192fb`, `2c91da1`, `944f75c`), plus PR #2's translation. No PR to `qa` yet | - |
-| main | `hu-front-main` -> `main` | Not started | - |
+| qa | `hu-front-qa` -> `qa` (PR #3) | Not in Week 10. On 2026-10-13 (Week 11) emelendez20201-ship-it created `hu-front-qa` from `qa` with my three commits re-applied by `cherry-pick -x` (`6f192fb`, `2c91da1`, `944f75c`) plus PR #2's translation, and merged it into `qa` as PR #3 | `0837657` |
+| main | `hu-front-main` -> `main` | Not started; `main` is still the initial seed and ftx-front has no tags (checked on 2026-10-13) | - |
 
 ## 3. Blockers and risks
 - The frontend has only run against the browser mock; no microservice or API Gateway was available to test against.
@@ -71,7 +73,7 @@ Criteria from `ftx-docs/04-requirements/user-stories.md`. The services own these
 - The `develop` branch name for PR #1 is `feat/web-frontend` (allowed for `develop` by `ftx-docs/00-governance/branching-policy.md`), not the `hu-xxx-dev` name used in the course README.
 
 ## 4. Plan for next week
-- Promote the frontend: open the PR `hu-front-qa` -> `qa` (branch already created on 2026-10-13), then `hu-front-main` -> `main`.
+- Promote the frontend: `hu-front-qa` -> `qa` (done by emelendez20201-ship-it on 2026-10-13, PR #3), then `hu-front-main` -> `main`.
 - Already started on 2026-10-13 (Week 11): `4f761bc` `chore(web): enable the fourth court in the mock data` and `7aba700` `feat(web): reject reservations that start before the current time` (branches pushed, PRs to `develop` pending).
 - Add frontend tests: done in Week 11 on `hu-front-tests-dev` (pushed 2026-10-13, 48 tests, PR to `develop` pending) - see `11-week/hu-status`.
 - Connect the UI to the real API Gateway once the services are deployed in `develop`.

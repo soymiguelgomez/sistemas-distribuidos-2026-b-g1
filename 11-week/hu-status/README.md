@@ -17,6 +17,7 @@
 | HU-RES-002 | Create Field Reservation - reject start times before the current business time (America/Bogota) | doing | https://github.com/code-corhuila/ftx-front/commit/7aba700e6e338df3666a3122b82c0b23becf0266 |
 | HU-RES-002 / HU-RES-004 / HU-ADM-001 | Frontend tests: 409 slot conflict, 404 lookup by code, admin route guard | doing | https://github.com/code-corhuila/ftx-front/tree/hu-front-tests-dev |
 | N/A (no HU ID) | Contract tests: mock responses validated against the ftx-docs OpenAPI contracts | doing | https://github.com/code-corhuila/ftx-front/commit/b4b8f7966ff309fd09bf7ac44173882e98187fdb |
+| HU-ARC-001 | Record ADR-009 and ADR-010 (ftx-docs) | doing | https://github.com/code-corhuila/ftx-docs/tree/hu-arc-001-dev |
 | N/A (no HU ID) | Mock data: fourth court bookable | doing | https://github.com/code-corhuila/ftx-front/commit/4f761bcacc3cd9bd1825aca3c2fbb92ddf771272 |
 
 All rows are "doing": the branches are pushed, but no PR to `develop` has been opened or merged yet (status on 2026-10-13).
@@ -45,8 +46,8 @@ Criteria from `ftx-docs/04-requirements/user-stories.md`. Each item is now cover
 | Contracts (OpenAPI / events) | Yes: contract tests keep the frontend's mock aligned with `07-api/contracts/openapi` |
 | Saga / Outbox | None yet |
 | Per-environment config | None yet (moving the demo credential to `VITE_*` variables is planned) |
-| ADR | None yet (ADR-005 and ADR-007 planned in ftx-docs) |
-| CHANGELOG | None yet (`CHANGELOG.md` [2.0.0] planned for ftx-front and ftx-docs) |
+| ADR | ADR-009 (service decomposition) and ADR-010 (saga style), both **Proposed** and not implemented, on ftx-docs branch `hu-arc-001-dev` (not pushed yet). ADR-005/006/007 are pending merge in PR #38 (Dannamo34) |
+| CHANGELOG | ftx-docs `CHANGELOG.md` with `[2.0.0] - Unreleased` and "Not included in this release", on `hu-arc-001-dev` (not pushed yet). ftx-front: none yet |
 | Tests (code quality) | Yes: first test suite of ftx-front - unit, component and contract (48 tests) |
 
 ### Commits (author soymiguelgomez, 2026-10-12 to 2026-10-13)
@@ -60,7 +61,12 @@ Criteria from `ftx-docs/04-requirements/user-stories.md`. Each item is now cover
 | ftx-front | `b4b8f79` | 2026-10-13 20:43 | test(web): validate mock responses against the openapi contracts | `hu-front-tests-dev` - no PR yet |
 | ftx-front | `477d44f` | 2026-10-13 20:43 | docs(web): document how to run the tests | `hu-front-tests-dev` - no PR yet |
 | ftx-front | `45bc116` | 2026-10-13 21:08 | docs(web): document the hu branch naming and the test folders | `hu-front-tests-dev` - not pushed yet |
-| ftx-docs | - | - | No commits this week so far | - |
+| ftx-docs | `d944c05` | 2026-10-13 21:51 | docs(docs): add hu-arc-001 to the user stories | `hu-arc-001-dev` - not pushed yet |
+| ftx-docs | `8de7c49` | 2026-10-13 21:51 | docs(docs): propose adr-009 service decomposition | `hu-arc-001-dev` - not pushed yet |
+| ftx-docs | `1c92ef6` | 2026-10-13 21:51 | docs(docs): propose adr-010 saga style | `hu-arc-001-dev` - not pushed yet |
+| ftx-docs | `40d5dde` | 2026-10-13 21:51 | docs(docs): add changelog for 2.0.0 | `hu-arc-001-dev` - not pushed yet |
+| ftx-docs | `9d290a3` | 2026-10-13 21:51 | docs(docs): add mvp 2 demo script | `hu-arc-001-dev` - not pushed yet |
+| ftx-docs | `9ebc9a8` | 2026-10-13 22:05 | docs(docs): rename the changelog section to not included in this release | `hu-arc-001-dev` - not pushed yet |
 
 ### Pull requests and flow
 | Stage | Branch -> target | Status |
@@ -68,7 +74,7 @@ Criteria from `ftx-docs/04-requirements/user-stories.md`. Each item is now cover
 | dev | `hu-front-tests-dev` -> `develop` | Pushed 2026-10-13, PR not opened |
 | dev | `feat/block-past-reservation-slots` -> `develop` | Pushed 2026-10-13, PR not opened |
 | dev | `chore/enable-fourth-court-mock` -> `develop` | Pushed 2026-10-13, PR not opened |
-| qa | `hu-front-qa` -> `qa` | Created 2026-10-13 by emelendez20201-ship-it with my Week 10 commits re-applied by `cherry-pick -x` (`6f192fb`, `2c91da1`, `944f75c`) and PR #2's translation. No PR to `qa` yet |
+| qa | `hu-front-qa` -> `qa` (PR #3) | Created and merged on 2026-10-13 by emelendez20201-ship-it with my Week 10 commits re-applied by `cherry-pick -x` (`6f192fb`, `2c91da1`, `944f75c`) and PR #2's translation (merge `0837657`). This week's new commits are not in it |
 | main | `hu-front-main` -> `main` | Not started |
 
 ## 3. Blockers and risks
@@ -80,8 +86,8 @@ Criteria from `ftx-docs/04-requirements/user-stories.md`. Each item is now cover
 
 ## 4. Plan for next week
 - Resilience in ftx-front (`hu-front-resilience-dev`): retry notice for 5xx, 503 and timeouts, an error boundary, a polling limit on the payment confirmation, and the demo credential moved to `VITE_*` variables.
-- Open the PRs to `develop`, then promote with `cherry-pick -x` through `hu-front-qa` -> `qa` and `hu-front-main` -> `main`; add `CHANGELOG.md` [2.0.0] and version 2.0.0.
-- ftx-docs: ADR-005 and ADR-007 (Proposed), `CHANGELOG.md` [2.0.0], and PRs for the two 10-devops branches left without one in Week 08.
+- Open the PRs to `develop`, then promote with `cherry-pick -x` to `qa` and through `hu-front-main` -> `main`; add `CHANGELOG.md` [2.0.0] and version 2.0.0.
+- ftx-docs: publish `hu-arc-001-dev` and open its PR to `main`; PRs for the two 10-devops branches left without one in Week 08.
 
 ## 5. Compliance self-check
 - [x] Conventional Commits - `type(scope): summary`

@@ -47,6 +47,8 @@
 | ftx-docs | `4ab6938` | 2026-09-18 19:44 | Add files via upload | `docs/update-10-local-setup` - PR #16 |
 | ftx-docs | `2b6fb9c` | 2026-09-18 19:45 | Add files via upload | `docs/update-10-readme` - PR #17 |
 | ftx-front | - | - | No commits this week | - |
+| ftx-schedules-db | - | - | No commits this week | - |
+| fork | - | - | No commits this week | - |
 
 ### Pull requests and flow
 | PR | Branch -> target | Merged | Merge commit |

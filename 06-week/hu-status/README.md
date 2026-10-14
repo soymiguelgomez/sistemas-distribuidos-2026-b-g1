@@ -14,14 +14,14 @@
 ## 1. User stories worked this week
 | HU ID | Title | Status (todo/doing/done) | Evidence (PR or commit URL) |
 |---|---|---|---|
-| N/A | No commits authored by soymiguelgomez in ftx-docs or ftx-front this week | N/A | N/A |
+| N/A | No commits authored by soymiguelgomez in ftx-docs, ftx-front, ftx-schedules-db or this fork this week | N/A | N/A |
 
 ### Acceptance criteria met
 - None: no work was committed this week, so no acceptance criterion can be claimed.
 
 ## 2. My individual contribution
-- **No commits.** A review of every branch and every pull-request ref of `code-corhuila/ftx-docs` and `code-corhuila/ftx-front` (checked on 2026-10-13) shows no commit authored by `soymiguelgomez` between 2026-09-07 and 2026-09-13.
-- My previous commit in ftx-docs is from 2026-09-04 (Week 05, `1424ec8`, `_stacks/README.md`); the next one is from 2026-09-16 (Week 07).
+- **No commits.** A review of every branch and every pull-request ref of `code-corhuila/ftx-docs`, `code-corhuila/ftx-front` and `code-corhuila/ftx-schedules-db`, and of this fork (checked on 2026-10-13), shows no commit authored by `soymiguelgomez` between 2026-09-07 and 2026-09-13.
+- My previous commits are from 2026-09-04 (Week 05: ftx-docs `1424ec8`, `_stacks/README.md`, and fork `19a452d`); the next one is from 2026-09-16 (Week 07, ftx-docs).
 - `ftx-services` does not apply: the repository `code-corhuila/ftx-services` does not exist.
 
 ### Contribution to MVP 2 / v2.0.0
@@ -38,6 +38,8 @@
 |---|---|---|---|
 | ftx-docs | 0 | 0 | N/A |
 | ftx-front | 0 | 0 | N/A |
+| ftx-schedules-db | 0 | 0 | N/A |
+| fork | 0 | 0 | N/A |
 
 ## 3. Blockers and risks
 - No individual delivery this week; the 10-devops documentation work started in Week 07.
