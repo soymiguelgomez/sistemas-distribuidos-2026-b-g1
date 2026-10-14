@@ -8,86 +8,97 @@
 - FULL_NAME: Miguel Andres Gomez Gutierrez
 - GITHUB_USER: soymiguelgomez
 - TEAM: Futbolix
-- SPRINT_GOAL: Release / MVP 2 (v2.0.0) - frontend test suite (unit, component, contract), resilience, CHANGELOG and pending ADRs
+- SPRINT_GOAL: Release / MVP 2 (v2.0.0) - frontend test suite and past-start-time rule through reviewed PRs, ADR-009 and ADR-010, CHANGELOG 2.0.0, and the Week 08 planning artifacts published
 <!-- CONFIG-END -->
 
 ## 1. User stories worked this week
 | HU ID | Title | Status (todo/doing/done) | Evidence (PR or commit URL) |
 |---|---|---|---|
-| HU-RES-002 | Create Field Reservation - reject start times before the current business time (America/Bogota) | doing | https://github.com/code-corhuila/ftx-front/commit/7aba700e6e338df3666a3122b82c0b23becf0266 |
-| HU-RES-002 / HU-RES-004 / HU-ADM-001 | Frontend tests: 409 slot conflict, 404 lookup by code, admin route guard | doing | https://github.com/code-corhuila/ftx-front/tree/hu-front-tests-dev |
-| N/A (no HU ID) | Contract tests: mock responses validated against the ftx-docs OpenAPI contracts | doing | https://github.com/code-corhuila/ftx-front/commit/b4b8f7966ff309fd09bf7ac44173882e98187fdb |
-| HU-ARC-001 | Record ADR-009 and ADR-010 (ftx-docs) | doing | https://github.com/code-corhuila/ftx-docs/tree/hu-arc-001-dev |
-| N/A (no HU ID) | Mock data: fourth court bookable | doing | https://github.com/code-corhuila/ftx-front/commit/4f761bcacc3cd9bd1825aca3c2fbb92ddf771272 |
+| HU-RES-002 | Create Field Reservation - reject start times before the current business time (America/Bogota) | doing | https://github.com/code-corhuila/ftx-front/pull/8 |
+| HU-RES-002 / HU-RES-004 / HU-ADM-001 | Frontend test setup, API client tests and component tests (409 slot conflict, 404 lookup by code, admin route guard) | doing | https://github.com/code-corhuila/ftx-front/pull/7 |
+| HU-ARC-001 | Record ADR-009 and ADR-010 (ftx-docs) | doing | https://github.com/code-corhuila/ftx-docs/pull/42 |
+| N/A (no HU ID) | Revert of PR #40, merged into ftx-docs `main` without the required approval | doing | https://github.com/code-corhuila/ftx-docs/pull/41 |
+| N/A (no HU ID) | Week 08 MVP 2 planning artifacts published (written 2026-09-23) | doing | https://github.com/code-corhuila/ftx-docs/pull/43 |
+| N/A (no HU ID) | Board URL in `agile-conventions.md` points to the team project | doing | https://github.com/code-corhuila/ftx-docs/pull/44 |
+| N/A (no HU ID) | Mock data: fourth court bookable | doing | https://github.com/code-corhuila/ftx-front/pull/6 |
 
-All rows are "doing": the branches are pushed, but no PR to `develop` has been opened or merged yet (status on 2026-10-13).
+All rows are "doing": every PR is open and waiting for review (status on 2026-10-14). Nothing of this week is merged in `develop`, `qa` or `main`.
 
 ### Acceptance criteria met
-Criteria from `ftx-docs/04-requirements/user-stories.md`. Each item is now covered by an automated test, run against a stubbed gateway or the browser mock, not against the real services:
-- HU-RES-002 AC3/AC4: a `409 RESERVATION_SLOT_UNAVAILABLE` leads to the full-page "Esa franja acaba de ser reservada" screen, which keeps the court and date (`BookingDetailsPage.test.tsx`). Every create request sends an `Idempotency-Key`.
-- HU-RES-002 (business rule): `7aba700` rejects start times before the current minute in America/Bogota. Its own tests cover past, future and equal times, the time zone and the month change. The mock answers `422 BUSINESS_RULE_VIOLATION`.
-- HU-RES-004 AC1/AC3: a found code opens the detail page; a 404 and a malformed code show the same "not found" message, and a malformed code never calls the API (`LookupPage.test.tsx`).
-- HU-ADM-001 AC1/AC2: without a session, every `/admin` route redirects to the login and remembers the requested route; with a session the content is shown (`RequireAdmin.test.tsx`). Real enforcement still belongs to the gateway and services.
+Criteria from `ftx-docs/04-requirements/user-stories.md`. Each item is covered by an automated test in the open PRs, run against a stubbed gateway or the browser mock, not against real services:
+- HU-RES-002 AC3/AC4: a `409 RESERVATION_SLOT_UNAVAILABLE` leads to the full-page "Esa franja acaba de ser reservada" screen, which keeps the court and date. Every create request sends an `Idempotency-Key` (PRs #9, #10).
+- HU-RES-002 (business rule): reservations cannot start before the current minute in America/Bogota; the mock answers `422 BUSINESS_RULE_VIOLATION` (PR #8). This minute-level rule is not yet written in HU-RES-002 nor in `reservation-service.yaml`; the PR asks the Product Owner to add it.
+- HU-RES-004 AC1/AC3: a found code opens the detail page; a 404 and a malformed code show the same "not found" message (PR #10).
+- HU-ADM-001 AC1/AC2: without a session, every `/admin` route redirects to the login (PR #10). Real enforcement belongs to the gateway and services.
 
 ## 2. My individual contribution
-- `hu-front-tests-dev` (from `develop` `ce0c808`):
-  - Set up Vitest 3, Testing Library and jsdom, with `npm test`. The tests never read the local `.env`.
-  - 20 unit tests for the API clients (`/api/v1` prefix, query, `Idempotency-Key`, `Authorization`, retries of reads, token refresh on 401) and for `ErrorResponse` handling.
-  - 13 component tests: `ReservationCodeBlock`, the 409 screen, the 404 on lookup by code, `RequireAdmin`.
-  - 11 contract tests: every mock response, success and error, is validated with ajv against the OpenAPI schemas copied from ftx-docs (`main` `c0e9d23`) into `contracts/openapi/`, plus 4 tests proving the validator rejects invalid bodies. No difference between the mock and the contracts was found.
-  - README: how to run the tests, and the team's `hu-[story]-[environment]` branch naming.
-  - `typecheck`, `build` and `npm test` pass (48 tests).
-- `7aba700` (`feat/block-past-reservation-slots`): reservations cannot start before the current business minute in America/Bogota, in both the UI and the mock, with Vitest tests.
-- `4f761bc` (`chore/enable-fourth-court-mock`): Cancha 4 starts as ACTIVE in the mock, and `DB_VERSION` 2 reseeds browsers that kept the old data.
+- ftx-front, four PRs to `develop` that replace the earlier branches `hu-front-tests-dev` and `hu-res-002-dev` (deleted from the remote on 2026-10-14). Commits re-applied with `git cherry-pick -x`:
+  - PR #7 `chore/hu-res-002-test-setup`: Vitest 3, Testing Library, jsdom and `npm test` (`c6484c2`), and the removal of the dependencies used only by contract tests (`d8eb548`).
+  - PR #8 `feat/hu-res-002-past-start-time`: past-start-time rule in the UI and the mock, with 23 tests (`90d79a2`, from `7aba700`).
+  - PR #9 `chore/hu-res-002-tests-api-clients`: 20 unit tests for the API clients and `ErrorResponse` handling (`ccdfc75`).
+  - PR #10 `chore/hu-res-002-tests-components`: 13 component tests (`3b52262`), and booking tests that use a future date relative to today (`6f6347f`).
+  - Verified locally: `typecheck`, `build` and `npm test` pass on each branch; all four combined run 9 test files and 56 tests.
+  - PR #6 `chore/enable-fourth-court-mock`: Cancha 4 starts as ACTIVE in the mock (`4f761bc`).
+- ftx-docs:
+  - Pushed `hu-arc-001-dev` (HU-ARC-001: ADR-009, ADR-010, CHANGELOG 2.0.0, MVP 2 demo script). It reached `main` as PR #40, merged from my account ten seconds after it was opened and without the approval of ariel5253 that `branching-policy.md` requires.
+  - Corrected it with PR #41 (`hotfix/revert-pr-40`, `ffa817c`), which restores `main`, and PR #42 (`feat/hu-arc-001-adr-009-010`, the same 7 commits re-applied with `cherry-pick -x`), both waiting for ariel5253.
+  - PR #43: published unchanged the Week 08 planning artifacts written on 2026-09-23 (`c6bb07a`, `cf57fc8`, `d6ec6dc`, `473cd7a`).
+  - PR #44: Board URL of `agile-conventions.md` set to the team project #20 (`cfb7696`).
+  - Comment on PR #38 (Dannamo34): ADR-009 and ADR-010 reference ADR-005, 006 and 007 as pending merge.
+- ftx-schedules-db: closed my PR #1 as superseded by HU-ADM-001 (v2.0.0), whose README credits that branch.
+- This fork: weekly reports for weeks 06 to 11 updated with verifiable evidence.
 
 ### Contribution to MVP 2 / v2.0.0
 | Area | This week |
 |---|---|
-| Contracts (OpenAPI / events) | Yes: contract tests keep the frontend's mock aligned with `07-api/contracts/openapi` |
-| Saga / Outbox | None yet |
-| Per-environment config | None yet (moving the demo credential to `VITE_*` variables is planned) |
-| ADR | ADR-009 (service decomposition) and ADR-010 (saga style), both **Proposed** and not implemented, on ftx-docs branch `hu-arc-001-dev` (not pushed yet). ADR-005/006/007 are pending merge in PR #38 (Dannamo34) |
-| CHANGELOG | ftx-docs `CHANGELOG.md` with `[2.0.0] - Unreleased` and "Not included in this release", on `hu-arc-001-dev` (not pushed yet). ftx-front: none yet |
-| Tests (code quality) | Yes: first test suite of ftx-front - unit, component and contract (48 tests) |
+| Contracts (OpenAPI / events) | Contract tests against the ftx-docs OpenAPI contracts exist locally but are not published: ftx-docs is private and ftx-front is public, and the Tech Lead and the instructor have been asked whether the contracts may be copied there |
+| Saga / Outbox | ADR-010 recommends a choreographed saga (Proposed, not implemented). Outbox: ADR-006 pending merge in PR #38 |
+| Per-environment config | None this week |
+| ADR | ADR-009 and ADR-010, Proposed and not implemented (PR #42) |
+| CHANGELOG | ftx-docs `CHANGELOG.md` `[2.0.0] - Unreleased` with "Not included in this release" (PR #42). ftx-front: none |
+| Tests (code quality) | First test suite of ftx-front in PRs #7 to #10 (56 tests combined) |
 
-### Commits (author soymiguelgomez, 2026-10-12 to 2026-10-13)
+### Commits (author soymiguelgomez, 2026-10-12 to 2026-10-14)
 | Repo | Hash | Date | Message | Branch / PR |
 |---|---|---|---|---|
-| ftx-front | `4f761bc` | 2026-10-13 16:56 | chore(web): enable the fourth court in the mock data | `chore/enable-fourth-court-mock` - no PR yet |
-| ftx-front | `7aba700` | 2026-10-13 17:05 | feat(web): reject reservations that start before the current time | `feat/block-past-reservation-slots` - no PR yet |
-| ftx-front | `d06cb96` | 2026-10-13 20:43 | chore(web): set up vitest with testing library and jsdom | `hu-front-tests-dev` - no PR yet |
-| ftx-front | `20cf262` | 2026-10-13 20:43 | test(web): cover api clients and error response handling | `hu-front-tests-dev` - no PR yet |
-| ftx-front | `549cf8b` | 2026-10-13 20:43 | test(web): cover reservation code, slot conflict, lookup 404 and admin guard | `hu-front-tests-dev` - no PR yet |
-| ftx-front | `b4b8f79` | 2026-10-13 20:43 | test(web): validate mock responses against the openapi contracts | `hu-front-tests-dev` - no PR yet |
-| ftx-front | `477d44f` | 2026-10-13 20:43 | docs(web): document how to run the tests | `hu-front-tests-dev` - no PR yet |
-| ftx-front | `45bc116` | 2026-10-13 21:08 | docs(web): document the hu branch naming and the test folders | `hu-front-tests-dev` - not pushed yet |
-| ftx-docs | `d944c05` | 2026-10-13 21:51 | docs(docs): add hu-arc-001 to the user stories | `hu-arc-001-dev` - not pushed yet |
-| ftx-docs | `8de7c49` | 2026-10-13 21:51 | docs(docs): propose adr-009 service decomposition | `hu-arc-001-dev` - not pushed yet |
-| ftx-docs | `1c92ef6` | 2026-10-13 21:51 | docs(docs): propose adr-010 saga style | `hu-arc-001-dev` - not pushed yet |
-| ftx-docs | `40d5dde` | 2026-10-13 21:51 | docs(docs): add changelog for 2.0.0 | `hu-arc-001-dev` - not pushed yet |
-| ftx-docs | `9d290a3` | 2026-10-13 21:51 | docs(docs): add mvp 2 demo script | `hu-arc-001-dev` - not pushed yet |
-| ftx-docs | `9ebc9a8` | 2026-10-13 22:05 | docs(docs): rename the changelog section to not included in this release | `hu-arc-001-dev` - not pushed yet |
+| ftx-front | `4f761bc` | 2026-10-13 16:56 | chore(web): enable the fourth court in the mock data | `chore/enable-fourth-court-mock` - PR #6 |
+| ftx-front | `c6484c2` | 2026-10-13 22:57 | chore(web): set up vitest with testing library and jsdom | `chore/hu-res-002-test-setup` - PR #7 |
+| ftx-front | `d8eb548` | 2026-10-13 22:57 | chore(web): keep only the test runner dependencies | `chore/hu-res-002-test-setup` - PR #7 |
+| ftx-front | `90d79a2` | 2026-10-13 22:58 | feat(web): reject reservations that start before the current time | `feat/hu-res-002-past-start-time` - PR #8 |
+| ftx-front | `ccdfc75` | 2026-10-13 22:59 | test(web): cover api clients and error response handling | `chore/hu-res-002-tests-api-clients` - PR #9 |
+| ftx-front | `3b52262` | 2026-10-13 22:59 | test(web): cover reservation code, slot conflict, lookup 404 and admin guard | `chore/hu-res-002-tests-components` - PR #10 |
+| ftx-front | `6f6347f` | 2026-10-13 23:00 | test(web): use a future date relative to today in the booking details tests | `chore/hu-res-002-tests-components` - PR #10 |
+| ftx-docs | `d944c05` to `b9daa4f` (7) | 2026-10-13 21:51 to 22:22 | docs(docs): HU-ARC-001, ADR-009, ADR-010, changelog, demo script | `hu-arc-001-dev` - PR #40 (merged without review) |
+| ftx-docs | `ffa817c` | 2026-10-13 22:53 | docs(docs): revert pr #40, merged into main without the required approval | `hotfix/revert-pr-40` - PR #41 |
+| ftx-docs | `c778561` to `e189e5e` (7) | 2026-10-13 22:56 | same 7 commits re-applied with `cherry-pick -x` | `feat/hu-arc-001-adr-009-010` - PR #42 |
+| ftx-docs | `c6bb07a`, `cf57fc8`, `d6ec6dc`, `473cd7a` | 2026-10-14 07:10 | docs(docs): week 08 mvp 2 planning artifacts | `docs/mvp2-planning` - PR #43 |
+| ftx-docs | `cfb7696` | 2026-10-14 07:12 | docs(docs): point the board url to the team project | `docs/agile-board-url` - PR #44 |
+| fork | `71a2246`, `919380c`, `b7fa855`, `2963b24`, `4fcd365` | 2026-10-13 20:23 to 2026-10-14 07:12 | docs(hu-status): weekly reports | `main` of this fork |
+
+Commit dates are the commit (re-application) dates; the original author dates of the cherry-picked commits are kept in each commit.
 
 ### Pull requests and flow
 | Stage | Branch -> target | Status |
 |---|---|---|
-| dev | `hu-front-tests-dev` -> `develop` | Pushed 2026-10-13, PR not opened |
-| dev | `feat/block-past-reservation-slots` -> `develop` | Pushed 2026-10-13, PR not opened |
-| dev | `chore/enable-fourth-court-mock` -> `develop` | Pushed 2026-10-13, PR not opened |
-| qa | `hu-front-qa` -> `qa` (PR #3) | Created and merged on 2026-10-13 by emelendez20201-ship-it with my Week 10 commits re-applied by `cherry-pick -x` (`6f192fb`, `2c91da1`, `944f75c`) and PR #2's translation (merge `0837657`). This week's new commits are not in it |
-| main | `hu-front-main` -> `main` | Not started |
+| dev | ftx-front #6 `chore/enable-fourth-court-mock` -> `develop` | Open, review requested from HERMAR55611 (and ariel5253 by CODEOWNERS) |
+| dev | ftx-front #7, #8, #9, #10 -> `develop` | Open, same reviewers; merge order #7, then #8 and #9, then #10 |
+| qa | `hu-front-qa` -> `qa` (ftx-front #3) | Merged on 2026-10-13 by emelendez20201-ship-it with my Week 10 commits re-applied by `cherry-pick -x`. This week's commits are not in `qa` yet |
+| main | ftx-front #5 `release/2.0.0` -> `main` (emelendez20201-ship-it) | Open; it does not include this week's PRs (comment posted asking whether to include them) |
+| main (docs) | ftx-docs #41, then #42, #43, #44 -> `main` | Open, review requested from ariel5253 |
 
 ## 3. Blockers and risks
-- `7aba700` and `hu-front-tests-dev` both add Vitest and the `test` script, and `7aba700` changes the README in Spanish while `develop` now has it in English. Whichever PR is merged second must be rebased (package files and README).
-- `npm audit` reports 2 critical and 1 moderate advisories in Vitest 3's own dependencies (`tinypool`, `@vitest/mocker`). They are dev-only and not in the nginx image; the full fix needs Vitest 4, a breaking upgrade.
+- PR #40 in ftx-docs was merged into `main` from my account without review; `main` of ftx-docs has no branch protection (private repository; the protection API answers 403 on this plan). Correction in PRs #41 and #42.
+- In the Week 08 files HU-ARC-001 means "ADR-005, ADR-006, ADR-007", while PR #42 uses it for "Record ADR-009 and ADR-010". The Product Owner must choose the IDs.
+- PR #7 alone leaves `npm test` with exit code 1 ("No test files found") until PR #8 or #9 is merged.
+- `npm audit` reports advisories in Vitest 3's dev-only dependencies (`tinypool`, `@vitest/mocker`); the full fix needs Vitest 4.
 - The demo administrator login is still a string in `src/api/mock/constants.ts`.
-- Docker is not installed on my machine, so the nginx image build has not been verified locally.
-- No PR has been opened yet, so nothing from this week is in `develop`, `qa` or `main`.
+- Docker is not installed on my machine: the nginx image and Part 1 of the demo script have not been run.
 
 ## 4. Plan for next week
-- Resilience in ftx-front (`hu-front-resilience-dev`): retry notice for 5xx, 503 and timeouts, an error boundary, a polling limit on the payment confirmation, and the demo credential moved to `VITE_*` variables.
-- Open the PRs to `develop`, then promote with `cherry-pick -x` to `qa` and through `hu-front-main` -> `main`; add `CHANGELOG.md` [2.0.0] and version 2.0.0.
-- ftx-docs: publish `hu-arc-001-dev` and open its PR to `main`; PRs for the two 10-devops branches left without one in Week 08.
+- Address review comments on ftx-front #6 to #10 and ftx-docs #41 to #44; after merge, promote the frontend changes to `qa` with `cherry-pick -x`.
+- Get an answer on the contract copies (Tech Lead and instructor) and, if allowed, open the contract-tests PR.
+- Move the demo credential of ftx-front to `VITE_*` variables.
+- Configure weekly Sprint iterations in the team board (Project #20) with the team.
 
 ## 5. Compliance self-check
 - [x] Conventional Commits - `type(scope): summary`
@@ -98,10 +109,10 @@ Criteria from `ftx-docs/04-requirements/user-stories.md`. Each item is now cover
 - [x] No secrets; config via environment variables
 
 ## 6. Evidence links
-- Tests branch: https://github.com/code-corhuila/ftx-front/tree/hu-front-tests-dev
-- Open the PR to develop: https://github.com/code-corhuila/ftx-front/pull/new/hu-front-tests-dev
-- Contract tests: https://github.com/code-corhuila/ftx-front/blob/hu-front-tests-dev/src/api/mock/contract.test.ts
-- Past start times: https://github.com/code-corhuila/ftx-front/commit/7aba700e6e338df3666a3122b82c0b23becf0266
-- Fourth court: https://github.com/code-corhuila/ftx-front/commit/4f761bcacc3cd9bd1825aca3c2fbb92ddf771272
-- qa branch: https://github.com/code-corhuila/ftx-front/tree/hu-front-qa
-- Self-check notes: all commits use `type(scope): summary`. `hu-front-tests-dev` follows the hu branch naming, but its PR to `develop` is not open yet. The stories have Given/When/Then criteria. 48 tests were added, plus the tests in `7aba700`. The frontend has no DDD domain layer to evaluate. Configuration comes from `VITE_*` variables with no real secret; the only credential is the mock-only demo login, which is planned to move to `VITE_*` variables.
+- ftx-front PRs: https://github.com/code-corhuila/ftx-front/pull/6, https://github.com/code-corhuila/ftx-front/pull/7, https://github.com/code-corhuila/ftx-front/pull/8, https://github.com/code-corhuila/ftx-front/pull/9, https://github.com/code-corhuila/ftx-front/pull/10
+- ftx-docs PRs: https://github.com/code-corhuila/ftx-docs/pull/40 (merged without review), https://github.com/code-corhuila/ftx-docs/pull/41, https://github.com/code-corhuila/ftx-docs/pull/42, https://github.com/code-corhuila/ftx-docs/pull/43, https://github.com/code-corhuila/ftx-docs/pull/44
+- Comment on ftx-docs PR #38: https://github.com/code-corhuila/ftx-docs/pull/38#issuecomment-6160545907
+- Comment on ftx-front PR #5: https://github.com/code-corhuila/ftx-front/pull/5#issuecomment-6160546246
+- ftx-schedules-db PR #1 (closed as superseded): https://github.com/code-corhuila/ftx-schedules-db/pull/1
+- qa promotion of the Week 10 work: https://github.com/code-corhuila/ftx-front/pull/3
+- Self-check notes: all commits use `type(scope): summary` (the hu-status commit `b7fa855` too). The ftx-front branches use `feat/` and `chore/` children of `develop`, allowed by `branching-policy.md`, not `hu-xxx-dev`. The stories have Given/When/Then criteria. Tests were added in PRs #7 to #10. The frontend has no DDD domain layer to evaluate. Configuration comes from `VITE_*` variables; the only credential is the mock-only demo login.
