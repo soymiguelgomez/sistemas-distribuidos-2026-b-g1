@@ -73,7 +73,8 @@ Criteria from `ftx-docs/04-requirements/user-stories.md`. The services own these
 ## 4. Plan for next week
 - Promote the frontend: open the PR `hu-front-qa` -> `qa` (branch already created on 2026-10-13), then `hu-front-main` -> `main`.
 - Already started on 2026-10-13 (Week 11): `4f761bc` `chore(web): enable the fourth court in the mock data` and `7aba700` `feat(web): reject reservations that start before the current time` (branches pushed, PRs to `develop` pending).
-- Add frontend tests and connect the UI to the real API Gateway once the services are deployed in `develop`.
+- Add frontend tests: done in Week 11 on `hu-front-tests-dev` (pushed 2026-10-13, 48 tests, PR to `develop` pending) - see `11-week/hu-status`.
+- Connect the UI to the real API Gateway once the services are deployed in `develop`.
 
 ## 5. Compliance self-check
 - [x] Conventional Commits - `type(scope): summary`
