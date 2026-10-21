@@ -27,6 +27,7 @@
 | N/A (no HU ID) | Board URL in `agile-conventions.md` points to the team project | doing | https://github.com/code-corhuila/ftx-docs/pull/44 |
 | N/A (no HU ID) | Mock data: fourth court bookable | doing | https://github.com/code-corhuila/ftx-front/pull/6 |
 | N/A (no HU ID) | Week 11 observability workshop, delivery 1 (CP0 to CP4) on the "customer creates a reservation" journey | done | https://github.com/soymiguelgomez/sistemas-distribuidos-2026-b-g1/tree/main/11-week/workshop |
+| N/A (no HU ID) | Week 11 observability workshop, delivery 2 (CP6 to CP9): SLOs, burn-rate alerts, runbook, incident drill and postmortem | done | https://github.com/soymiguelgomez/sistemas-distribuidos-2026-b-g1/tree/main/11-week/workshop |
 
 Status on 2026-10-14 (afternoon): HERMAR55611 approved and merged ftx-front #7, #9 and #14 into `develop`; on that commit (`29f1767`) `npm run typecheck`, `npm test` (6 files, 40 tests) and `npm run build` pass. ariel5253 approved every other open PR listed here; they are not merged yet, so those rows stay "doing". Nothing of this week is in `qa` or `main`. HU-PAY-006 is "done" only for its frontend part: the real circuit breaker belongs to `payment-service`, which has no code.
 
@@ -68,6 +69,12 @@ Criteria from `ftx-docs/04-requirements/user-stories.md`. Each item is covered b
   - CP3 `03-instrumentation/`: `reservation-service` module in Node.js without dependencies (trace-context middleware, structured logger, propagation to court-service, `/metrics`). `npm test`: 3 tests, 3 passing; the propagation test fails when the outgoing `traceparent` is removed. Not in Java/Spring: no JDK, Maven or WSL on my machine.
   - CP4 `04-metrics.md`: golden signals per service, label cardinality, histogram buckets.
   - Before the workshop I merged `upstream/main` into this fork (`f4ff09a`), keeping my own `01-week/hu-status` files.
+  - After class I replaced the reflection link in the CONFIG with my final document (`aba13e7`).
+- Week 11 workshop, delivery 2 (2026-10-21, two work blocks, one push per checkpoint, at least 15 minutes apart):
+  - CP6 `05-slo.md`: availability (99.5 %), latency (95 % under 0.5 s) and payment-recorded (99.5 %) SLOs over 30 days. Traffic: 24 reservations a day, the minimum the four courts must sell to be profitable (6 per court), so 720 requests a month; availability budget 3.6 requests or 216 minutes. One failure is 28 % of that budget.
+  - CP7 `06-alerts.yml` and `06-alert-policy.md`: fast (14.4 in 1 h, 5 m) and slow (6 in 6 h, 30 m) burn-rate alerts measured at api-gateway. YAML parsed with PyYAML; `promtool check rules` not run (no Prometheus on my machine).
+  - CP8 `07-runbook.md`: symptoms, PromQL and `trace_id` log search, three mitigations by risk (restart, rollback, restart shared dependency), escalation by role, recovery checks.
+  - CP9 `08-incident.md`: drill of court-service answering in 3 s for 25 % of requests during 40 minutes (1 of 4 reservations failed, 28 % of the budget), blameless postmortem with three proposed stories (HU-OBS-001 to 003).
 
 ### Contribution to MVP 2 / v2.0.0
 | Area | This week |
@@ -80,7 +87,7 @@ Criteria from `ftx-docs/04-requirements/user-stories.md`. Each item is covered b
 | Tests (code quality) | First test suite of ftx-front in PRs #7 to #10 (56 tests combined), plus 20 tests for HU-PAY-006 in PR #14 and 2 for the error boundary in PR #15 |
 | Demo | Part 3 of the MVP 2 demo script (injected failure) written against ftx-front PR #14 (ftx-docs PR #46) |
 
-### Commits (author soymiguelgomez, 2026-10-12 to 2026-10-20)
+### Commits (author soymiguelgomez, 2026-10-12 to 2026-10-21)
 | Repo | Hash | Date | Message | Branch / PR |
 |---|---|---|---|---|
 | ftx-front | `4f761bc` | 2026-10-13 16:56 | chore(web): enable the fourth court in the mock data | `chore/enable-fourth-court-mock` - PR #6 |
@@ -118,6 +125,12 @@ Criteria from `ftx-docs/04-requirements/user-stories.md`. Each item is covered b
 | fork | `b005df2` | 2026-10-20 19:24 | feat(w11): add trace-context middleware and structured logger | `main` - CP3, push 1 |
 | fork | `6d4cf5a`, `b705c23`, `272a6b8`, `88bdbfd` | 2026-10-20 19:30 | feat(w11): add court-service client and request metrics; feat(w11): propagate context downstream and expose metrics; test(w11): prove trace_id propagation to court-service; docs(w11): add how-to-run with real console output | `main` - CP3, push 2 |
 | fork | `8f9206a` | 2026-10-20 19:31 | docs(w11): define golden signals and metric catalog | `main` - CP4 |
+| fork | `711e811` | 2026-10-20 19:33 | docs(w11): update hu-status for delivery 1 | `main` - CP5 |
+| fork | `aba13e7` | 2026-10-20 20:04 | fix(w11): point the config to my reflection document | `main` - CP0 link |
+| fork | `f6fd484` | 2026-10-21 12:07 | docs(w11): define SLOs and error budget | `main` - CP6 |
+| fork | `6423005` | 2026-10-21 13:00 | feat(w11): add burn-rate alerting rules | `main` - CP7 |
+| fork | `41d3e21` | 2026-10-21 15:30 | docs(w11): write runbook for fast-burn alert | `main` - CP8 |
+| fork | `a17f32f`, `77f00a1` | 2026-10-21 15:50 | docs(w11): simulate slow court-service incident; docs(w11): run incident drill and postmortem | `main` - CP9 |
 
 Commit dates are the commit (re-application) dates; the original author dates of the cherry-picked commits are kept in each commit.
 
@@ -166,4 +179,5 @@ Commit dates are the commit (re-application) dates; the original author dates of
 - qa promotion of the Week 10 work: https://github.com/code-corhuila/ftx-front/pull/3
 - Week 11 workshop folder: https://github.com/soymiguelgomez/sistemas-distribuidos-2026-b-g1/tree/main/11-week/workshop
 - Week 11 workshop commits: https://github.com/soymiguelgomez/sistemas-distribuidos-2026-b-g1/commit/ee1dbef8ed4673a239cce8351ad739d343def328, https://github.com/soymiguelgomez/sistemas-distribuidos-2026-b-g1/commit/af73cd962f6b614d2a25ea1d8500cd428af16209, https://github.com/soymiguelgomez/sistemas-distribuidos-2026-b-g1/commit/f9c4eb1d9bbe0e4f99baadcd456bad8461a9eba8, https://github.com/soymiguelgomez/sistemas-distribuidos-2026-b-g1/commit/b005df2846b4d01d676b3872b00ec90d133a9626, https://github.com/soymiguelgomez/sistemas-distribuidos-2026-b-g1/commit/b705c234ca0b4a9ca6c32bcb93f8fd3f1d06984a, https://github.com/soymiguelgomez/sistemas-distribuidos-2026-b-g1/commit/272a6b8f20142999ac5d350bd07dffc27979fac1, https://github.com/soymiguelgomez/sistemas-distribuidos-2026-b-g1/commit/8f9206a0417a4439c3ad77436a3493230df2f413
+- Week 11 workshop commits, delivery 2: https://github.com/soymiguelgomez/sistemas-distribuidos-2026-b-g1/commit/f6fd484, https://github.com/soymiguelgomez/sistemas-distribuidos-2026-b-g1/commit/6423005, https://github.com/soymiguelgomez/sistemas-distribuidos-2026-b-g1/commit/41d3e21, https://github.com/soymiguelgomez/sistemas-distribuidos-2026-b-g1/commit/77f00a1
 - Self-check notes: every commit in the open PRs uses `type(scope): summary` with the scopes of `git-conventions.md` (`web` in ftx-front, `docs` in ftx-docs). Eight commits of this week used wrong or empty scopes; their PRs (#11, #12, #42) were closed and replaced with new commits, without rewriting history. The ftx-front branches use `feat/` and `chore/` children of `develop`, allowed by `branching-policy.md`, not `hu-xxx-dev`. The stories have Given/When/Then criteria. Tests were added in PRs #7 to #10, #14 and #15, and run before each new commit. The frontend has no DDD domain layer to evaluate. Configuration comes from `VITE_*` variables; with PR #13 the mock-only demo login is read from `VITE_MOCK_ADMIN_*` and is not in the production bundle.
