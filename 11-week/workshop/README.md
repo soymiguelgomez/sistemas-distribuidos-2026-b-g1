@@ -6,7 +6,7 @@
 - TEAM: Futbolix
 - DOCS_REPO: https://github.com/code-corhuila/ftx-docs
 - REFLECTION_DOC: https://docs.google.com/document/d/1DIJm6-GiV_mkgWayDpqmnWycQy3OdMCcZJex5QM0e7s/edit?usp=sharing
-- JOURNEY: (written in CP1)
+- JOURNEY: Customer creates a reservation (api-gateway -> reservation-service -> court-service -> RabbitMQ -> payment-service)
 <!-- CONFIG-END -->
 
 ## Files
