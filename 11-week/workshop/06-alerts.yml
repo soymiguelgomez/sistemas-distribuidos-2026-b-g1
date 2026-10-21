@@ -1,0 +1,59 @@
+# CP7 - Burn-rate alerts for SLO 1 (availability of POST /api/v1/reservations), see 05-slo.md.
+# SLO 99.5 % in 30 days -> error budget ratio 0.005.
+# Fast burn: 14.4 x 0.005 = 0.072 in 1 h, confirmed in 5 m.
+# Slow burn:  6   x 0.005 = 0.03  in 6 h, confirmed in 30 m.
+groups:
+  - name: futbolix-reservation-slo-recording
+    rules:
+      - record: futbolix:reservation_create_errors:ratio_rate5m
+        expr: |
+          sum(rate(gateway_requests_total{route="/api/v1/reservations",method="POST",status_class="5xx"}[5m]))
+          /
+          sum(rate(gateway_requests_total{route="/api/v1/reservations",method="POST"}[5m]))
+      - record: futbolix:reservation_create_errors:ratio_rate30m
+        expr: |
+          sum(rate(gateway_requests_total{route="/api/v1/reservations",method="POST",status_class="5xx"}[30m]))
+          /
+          sum(rate(gateway_requests_total{route="/api/v1/reservations",method="POST"}[30m]))
+      - record: futbolix:reservation_create_errors:ratio_rate1h
+        expr: |
+          sum(rate(gateway_requests_total{route="/api/v1/reservations",method="POST",status_class="5xx"}[1h]))
+          /
+          sum(rate(gateway_requests_total{route="/api/v1/reservations",method="POST"}[1h]))
+      - record: futbolix:reservation_create_errors:ratio_rate6h
+        expr: |
+          sum(rate(gateway_requests_total{route="/api/v1/reservations",method="POST",status_class="5xx"}[6h]))
+          /
+          sum(rate(gateway_requests_total{route="/api/v1/reservations",method="POST"}[6h]))
+
+  - name: futbolix-reservation-slo-alerts
+    rules:
+      - alert: ReservationCreateFastBurn
+        expr: |
+          futbolix:reservation_create_errors:ratio_rate1h > (14.4 * 0.005)
+          and
+          futbolix:reservation_create_errors:ratio_rate5m > (14.4 * 0.005)
+        labels:
+          severity: page
+          team: futbolix
+          service: reservation-service
+          slo: reservation-create-availability
+        annotations:
+          summary: "POST /api/v1/reservations is burning the 30-day error budget 14.4 times too fast"
+          description: "{{ $value | humanizePercentage }} of reservation requests failed with 5xx in the last 5 minutes (1 h window also above 7.2 %)."
+          runbook_url: "https://github.com/soymiguelgomez/sistemas-distribuidos-2026-b-g1/blob/main/11-week/workshop/07-runbook.md"
+
+      - alert: ReservationCreateSlowBurn
+        expr: |
+          futbolix:reservation_create_errors:ratio_rate6h > (6 * 0.005)
+          and
+          futbolix:reservation_create_errors:ratio_rate30m > (6 * 0.005)
+        labels:
+          severity: ticket
+          team: futbolix
+          service: reservation-service
+          slo: reservation-create-availability
+        annotations:
+          summary: "POST /api/v1/reservations is burning the 30-day error budget 6 times too fast"
+          description: "{{ $value | humanizePercentage }} of reservation requests failed with 5xx in the last 30 minutes (6 h window also above 3 %)."
+          runbook_url: "https://github.com/soymiguelgomez/sistemas-distribuidos-2026-b-g1/blob/main/11-week/workshop/07-runbook.md"
