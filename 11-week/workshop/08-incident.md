@@ -67,3 +67,74 @@ Following `07-runbook.md`: the logs of the trace show `court.slots.timeout`, and
 Step 1 (restart court-service, minute 24) does not help: the container is healthy, only slow.
 **Step 2, roll back court-service to `2.0.0`** (approved by the Tech Lead at minute 34, done
 at minute 38) stops the damage; at minute 40 every `bookable-slots` call is under 100 ms again.
+
+## Blameless postmortem - court-service 2.0.1 slow for weekend dates
+
+**Status:** drill. **Severity:** page (fast burn). **Duration:** 40 minutes.
+
+### Timeline (2026-10-23, Bogota time)
+
+| Time | Minute | Event |
+|---|---|---|
+| 18:00 | 0 | court-service `2.0.1` deployed to `prod` (new schedule query for `bookable-slots`) |
+| 18:05, 18:11 | 5, 11 | Two reservations created normally (weekday dates) |
+| 18:17:42 | 17 | A reservation for Saturday waits 1 s and gets `503` (trace `9b2e7c4d...`) |
+| 18:18 | 18 | `ReservationCreateFastBurn` and `ReservationCreateSlowBurn` fire; developer on duty paged |
+| 18:23 | 23 | Fast alert resolves by itself (empty 5 m window); developer keeps investigating |
+| 18:24 | 24 | Runbook step 1: court-service restarted; no change (container was healthy) |
+| 18:29 | 29 | Logs by `trace_id` show `court.slots.timeout` and court-service `2.0.1` answering in 3 s |
+| 18:33 | 33 | Fourth request (weekday) created normally |
+| 18:34 | 34 | Escalated to the Tech Lead (15 min after the page); rollback approved |
+| 18:38 | 38 | Runbook step 2: court-service rolled back to `2.0.0` |
+| 18:40 | 40 | `bookable-slots` P95 under 100 ms; test reservation created and cancelled; incident closed |
+| 18:48 | 48 | Slow alert resolves |
+
+### Impact
+
+- **Requests:** 1 of 4 `POST /api/v1/reservations` failed with `503`; 1 customer could not
+  book. No reservation was left `PENDING` without payment (SLO 3 untouched).
+- **Error budget:** availability 1 / 3.6 = 28 % of the month, about 0.28 x 216 = **60 minutes**
+  of budget; latency 1 / 36 = 2.8 %, about 0.028 x 2 160 = **60 minutes** of its budget.
+- Under the policy of `05-slo.md`, 28 % consumed is below the 50 % step: releases continue,
+  but this postmortem is written because more than 25 % was spent (`07-runbook.md`).
+
+### Root cause
+
+court-service `2.0.1` changed the `bookable-slots` query to read every schedule row of the
+court for weekend dates (two opening ranges). The `court` schema had no index for that
+filter, so about 25 % of the calls (the weekend ones) took 3 s. reservation-service gives up
+after 1 s, so each of them became a `503` for the customer.
+
+### Contributing factors
+
+- No latency check of court-service in `qa` before the release reached `prod`.
+- No circuit breaker or retry on the reservation-service client to court-service; Resilience4j
+  only protects the Wompi client (`05-architecture/overview.md`).
+- Low traffic: one failure in 40 minutes, and the fast alert cleared after 5 minutes, which
+  can make the incident look over when it is not.
+- Restarting first cost 10 minutes; the trace already pointed to a slow dependency, not a dead
+  one.
+
+### Actions (user stories, proposed IDs)
+
+**HU-OBS-001 - Circuit breaker on the court-service client.** As a customer, I want a fast,
+clear error when court-service is slow, so that I do not wait for nothing.
+- Given court-service answers after 1 s in 5 of the last 10 calls, when a new
+  `POST /api/v1/reservations` arrives, then reservation-service answers `503` in under 100 ms
+  without calling court-service.
+- Given the circuit is open, when 10 s pass and court-service answers in time, then the next
+  reservation is created normally.
+- The circuit state is exported as a metric and logged as `court.circuit.opened` with the
+  `trace_id`; an automated test covers both criteria.
+
+**HU-OBS-002 - One retry for the idempotent `bookable-slots` call.** As a customer, I want a
+single slow call to court-service not to cost me the reservation.
+- Given the first call times out and the second answers in 50 ms, when I create a reservation,
+  then I get `201` and the logs show `attempt: 2` with the same `trace_id`.
+- Total time is under 2.2 s; the retry is recorded in an ADR in `ftx-docs`.
+
+**HU-OBS-003 - Latency gate for court-service in `qa`.** As the Tech Lead, I want a release of
+court-service to be stopped in `qa` if `bookable-slots` gets slow.
+- Given the four courts with weekday and weekend schedules, when the `qa` smoke test calls
+  `bookable-slots` 100 times, then P95 is under 100 ms or the promotion to `main` is blocked.
+- The test result is attached to the release PR.
