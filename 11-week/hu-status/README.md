@@ -26,6 +26,7 @@
 | N/A (no HU ID) | Week 08 MVP 2 planning artifacts published (written 2026-09-23) | doing | https://github.com/code-corhuila/ftx-docs/pull/43 |
 | N/A (no HU ID) | Board URL in `agile-conventions.md` points to the team project | doing | https://github.com/code-corhuila/ftx-docs/pull/44 |
 | N/A (no HU ID) | Mock data: fourth court bookable | doing | https://github.com/code-corhuila/ftx-front/pull/6 |
+| N/A (no HU ID) | Week 11 observability workshop, delivery 1 (CP0 to CP4) on the "customer creates a reservation" journey | done | https://github.com/soymiguelgomez/sistemas-distribuidos-2026-b-g1/tree/main/11-week/workshop |
 
 Status on 2026-10-14 (afternoon): HERMAR55611 approved and merged ftx-front #7, #9 and #14 into `develop`; on that commit (`29f1767`) `npm run typecheck`, `npm test` (6 files, 40 tests) and `npm run build` pass. ariel5253 approved every other open PR listed here; they are not merged yet, so those rows stay "doing". Nothing of this week is in `qa` or `main`. HU-PAY-006 is "done" only for its frontend part: the real circuit breaker belongs to `payment-service`, which has no code.
 
@@ -60,6 +61,13 @@ Criteria from `ftx-docs/04-requirements/user-stories.md`. Each item is covered b
   - Comment on PR #38 (Dannamo34): ADR-009 and ADR-010 referenced ADR-005, 006 and 007 as pending merge. #38 was merged on 2026-10-14.
 - ftx-schedules-db: closed my PR #1 as superseded by HU-ADM-001 (v2.0.0), whose README credits that branch.
 - This fork: weekly reports for weeks 06 to 11 updated with verifiable evidence.
+- Week 11 workshop, delivery 1 (2026-10-20, in class), in `11-week/workshop/`, one push per checkpoint:
+  - CP0 `README.md` with the CONFIG block and the link to my reflection document.
+  - CP1 `01-journey.md`: hop table, Mermaid sequence with `traceparent` on every arrow and span tree for `POST /api/v1/reservations` (api-gateway, reservation-service, court-service, outbox, RabbitMQ `futbolix.events`, payment-service).
+  - CP2 `02-log-contract.md`: JSON log fields, domain fields, never-log list and seven example lines of one failed request.
+  - CP3 `03-instrumentation/`: `reservation-service` module in Node.js without dependencies (trace-context middleware, structured logger, propagation to court-service, `/metrics`). `npm test`: 3 tests, 3 passing; the propagation test fails when the outgoing `traceparent` is removed. Not in Java/Spring: no JDK, Maven or WSL on my machine.
+  - CP4 `04-metrics.md`: golden signals per service, label cardinality, histogram buckets.
+  - Before the workshop I merged `upstream/main` into this fork (`f4ff09a`), keeping my own `01-week/hu-status` files.
 
 ### Contribution to MVP 2 / v2.0.0
 | Area | This week |
@@ -72,7 +80,7 @@ Criteria from `ftx-docs/04-requirements/user-stories.md`. Each item is covered b
 | Tests (code quality) | First test suite of ftx-front in PRs #7 to #10 (56 tests combined), plus 20 tests for HU-PAY-006 in PR #14 and 2 for the error boundary in PR #15 |
 | Demo | Part 3 of the MVP 2 demo script (injected failure) written against ftx-front PR #14 (ftx-docs PR #46) |
 
-### Commits (author soymiguelgomez, 2026-10-12 to 2026-10-14)
+### Commits (author soymiguelgomez, 2026-10-12 to 2026-10-20)
 | Repo | Hash | Date | Message | Branch / PR |
 |---|---|---|---|---|
 | ftx-front | `4f761bc` | 2026-10-13 16:56 | chore(web): enable the fourth court in the mock data | `chore/enable-fourth-court-mock` - PR #6 |
@@ -103,6 +111,13 @@ Criteria from `ftx-docs/04-requirements/user-stories.md`. Each item is covered b
 | ftx-docs | `26a6cd3` | 2026-10-14 14:18 | docs(docs): describe part 3 of the demo, injected wompi failure in the frontend mock | `docs/demo-part-3-infra-rename` - PR #46 |
 | ftx-docs | `0e8df6c` | 2026-10-14 14:18 | docs(docs): use the ftx-infra-postgres name and its v1.0.0 release (`cherry-pick -x` of `44dde55`) | `docs/demo-part-3-infra-rename` - PR #46 |
 | fork | `71a2246`, `919380c`, `b7fa855`, `2963b24`, `4fcd365`, `56e4925`, `6edc736`, `1cb58c8` | 2026-10-13 20:23 to 2026-10-14 07:42 | docs(hu-status): weekly reports | `main` of this fork |
+| fork | `f4ff09a` | 2026-10-20 18:57 | chore(sync): merge upstream main into fork | `main` of this fork |
+| fork | `ee1dbef` | 2026-10-20 19:02 | docs(w11): start observability workshop | `main` - CP0 |
+| fork | `af73cd9` | 2026-10-20 19:09 | docs(w11): map critical journey and trace propagation | `main` - CP1 |
+| fork | `f9c4eb1` | 2026-10-20 19:18 | docs(w11): define structured log contract | `main` - CP2 |
+| fork | `b005df2` | 2026-10-20 19:24 | feat(w11): add trace-context middleware and structured logger | `main` - CP3, push 1 |
+| fork | `6d4cf5a`, `b705c23`, `272a6b8`, `88bdbfd` | 2026-10-20 19:30 | feat(w11): add court-service client and request metrics; feat(w11): propagate context downstream and expose metrics; test(w11): prove trace_id propagation to court-service; docs(w11): add how-to-run with real console output | `main` - CP3, push 2 |
+| fork | `8f9206a` | 2026-10-20 19:31 | docs(w11): define golden signals and metric catalog | `main` - CP4 |
 
 Commit dates are the commit (re-application) dates; the original author dates of the cherry-picked commits are kept in each commit.
 
@@ -149,4 +164,6 @@ Commit dates are the commit (re-application) dates; the original author dates of
 - Comment on ftx-front PR #5: https://github.com/code-corhuila/ftx-front/pull/5#issuecomment-6160546246
 - ftx-schedules-db PR #1 (closed as superseded): https://github.com/code-corhuila/ftx-schedules-db/pull/1
 - qa promotion of the Week 10 work: https://github.com/code-corhuila/ftx-front/pull/3
+- Week 11 workshop folder: https://github.com/soymiguelgomez/sistemas-distribuidos-2026-b-g1/tree/main/11-week/workshop
+- Week 11 workshop commits: https://github.com/soymiguelgomez/sistemas-distribuidos-2026-b-g1/commit/ee1dbef8ed4673a239cce8351ad739d343def328, https://github.com/soymiguelgomez/sistemas-distribuidos-2026-b-g1/commit/af73cd962f6b614d2a25ea1d8500cd428af16209, https://github.com/soymiguelgomez/sistemas-distribuidos-2026-b-g1/commit/f9c4eb1d9bbe0e4f99baadcd456bad8461a9eba8, https://github.com/soymiguelgomez/sistemas-distribuidos-2026-b-g1/commit/b005df2846b4d01d676b3872b00ec90d133a9626, https://github.com/soymiguelgomez/sistemas-distribuidos-2026-b-g1/commit/b705c234ca0b4a9ca6c32bcb93f8fd3f1d06984a, https://github.com/soymiguelgomez/sistemas-distribuidos-2026-b-g1/commit/272a6b8f20142999ac5d350bd07dffc27979fac1, https://github.com/soymiguelgomez/sistemas-distribuidos-2026-b-g1/commit/8f9206a0417a4439c3ad77436a3493230df2f413
 - Self-check notes: every commit in the open PRs uses `type(scope): summary` with the scopes of `git-conventions.md` (`web` in ftx-front, `docs` in ftx-docs). Eight commits of this week used wrong or empty scopes; their PRs (#11, #12, #42) were closed and replaced with new commits, without rewriting history. The ftx-front branches use `feat/` and `chore/` children of `develop`, allowed by `branching-policy.md`, not `hu-xxx-dev`. The stories have Given/When/Then criteria. Tests were added in PRs #7 to #10, #14 and #15, and run before each new commit. The frontend has no DDD domain layer to evaluate. Configuration comes from `VITE_*` variables; with PR #13 the mock-only demo login is read from `VITE_MOCK_ADMIN_*` and is not in the production bundle.
