@@ -1,0 +1,19 @@
+# Week 11 Workshop - Observability, SLOs and Incident Response on Futbolix
+
+<!-- CONFIG-START -->
+- FULL_NAME: Miguel Andres Gomez Gutierrez
+- GITHUB_USER: soymiguelgomez
+- TEAM: Futbolix
+- DOCS_REPO: https://github.com/code-corhuila/ftx-docs
+- REFLECTION_DOC: https://docs.google.com/document/d/1DIJm6-GiV_mkgWayDpqmnWycQy3OdMCcZJex5QM0e7s/edit?usp=sharing
+- JOURNEY: (written in CP1)
+<!-- CONFIG-END -->
+
+## Files
+
+| Checkpoint | File |
+|---|---|
+| CP1 | [01-journey.md](01-journey.md) |
+| CP2 | [02-log-contract.md](02-log-contract.md) |
+| CP3 | [03-instrumentation/](03-instrumentation/) |
+| CP4 | [04-metrics.md](04-metrics.md) |
