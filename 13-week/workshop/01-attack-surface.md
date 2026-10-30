@@ -27,7 +27,7 @@ flowchart LR
     RS["reservation-service :8083"]
     PS["payment-service :8084"]
     MQ[("RabbitMQ :5672<br/>exchange futbolix.events")]
-    DB[("PostgreSQL :5432<br/>reservation_db, payment_db,<br/>court, user")]
+    DB[("PostgreSQL :5432<br/>user_db, court_db,<br/>reservation_db, payment_db")]
   end
 
   subgraph Z2["Zone 2 - External"]
