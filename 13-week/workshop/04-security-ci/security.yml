@@ -40,7 +40,7 @@ jobs:
         working-directory: ${{ env.SERVICE_DIR }}
         env:
           NVD_API_KEY: ${{ secrets.NVD_API_KEY }}
-        run: mvn -B org.owasp:dependency-check-maven:12.1.0:check -DfailBuildOnCVSS=7 -DnvdApiKey="$NVD_API_KEY"
+        run: mvn -B org.owasp:dependency-check-maven:12.2.2:check -DfailBuildOnCVSS=7 -DnvdApiKey="$NVD_API_KEY"
 
   authorization-tests:
     name: Negative authorization tests
