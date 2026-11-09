@@ -1,26 +1,29 @@
-# Certification C3 — <Full name>
-
-> Template of the corte 3 certification. Replace every `<...>` with your data and delete this note. The rules are in the guide attached to the c3-certification activity in Moodle. Text left as `<...>` counts as missing.
+# Certification C3 — Miguel Andrés Gómez Gutiérrez
 
 ## Cover
 
 | Field | Value |
 |---|---|
-| Full name | <Full name exactly as in Moodle> |
-| GitHub user | <github-user> |
-| Group | <G1 or G2> |
-| Team | <Team name> |
-| Team -docs repository | <https://github.com/code-corhuila/...-docs> |
-| Course | <Exact course name> |
-| Course link | <Course URL> |
-| Start date | <YYYY-MM-DD> |
+| Full name | Miguel Andrés Gómez Gutiérrez |
+| GitHub user | soymiguelgomez |
+| Group | G1 |
+| Team | Futbolix |
+| Team -docs repository | https://github.com/code-corhuila/ftx-docs |
+| Course | HCCDP-Solution Architectures Course |
+| Course link | https://e.huawei.com/en/talent/ict-academy/#/ictcourses-detail?courseId=6WtKiPd1S1YelBB0AUbE1vXlPgk |
+| Start date | 2026-10-29 |
 | Completion date | <YYYY-MM-DD> |
 
 ## Study log
 
 | Date | Hours | Chapters or labs | Evidence file |
 |---|---|---|---|
-| <YYYY-MM-DD> | <h> | <Chapters or labs> | <evidence/NN-....png> |
+| 2026-10-29 | <h> | Pre-class guidance, chapter 1, chapter 2 (started) | evidence/01-chapter-01.png |
+| 2026-10-30 | <h> | Chapter 2, chapter 3 (started) | evidence/02-chapter-02.png |
+| 2026-11-04 | <h> | Chapters 3 and 4 | evidence/03-chapter-03.png, evidence/04-chapter-04.png |
+| 2026-11-05 | <h> | Chapter 5 | evidence/05-chapter-05.png |
+| 2026-11-06 | <h> | Chapter 6 | evidence/06-chapter-06.png |
+| 2026-11-09 | <h> | Chapter 7 | evidence/07-chapter-07.png |
 | Total | <sum> | | |
 
 ## Labs
