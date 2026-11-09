@@ -18,13 +18,13 @@
 
 | Date | Hours | Chapters or labs | Evidence file |
 |---|---|---|---|
-| 2026-10-29 | 3 | Pre-class guidance, chapter 1, chapter 2 (started) | evidence/01-chapter-01.png |
-| 2026-10-30 | 3 | Chapter 2, chapter 3 (started) | evidence/02-chapter-02.png |
-| 2026-11-04 | 3 | Chapters 3 and 4 | evidence/03-chapter-03.png, evidence/04-chapter-04.png |
-| 2026-11-05 | 3 | Chapter 5 | evidence/05-chapter-05.png |
-| 2026-11-06 | 3 | Chapter 6 | evidence/06-chapter-06.png |
-| 2026-11-09 | 3 | Chapter 7 | evidence/07-chapter-07.png |
-| Total | 18 | | |
+| 2026-10-29 | 5 | Pre-class guidance, chapter 1, chapter 2 (started) | evidence/01-chapter-01.png |
+| 2026-10-30 | 5 | Chapter 2, chapter 3 (started) | evidence/02-chapter-02.png |
+| 2026-11-04 | 6 | Chapters 3 and 4 | evidence/03-chapter-03.png, evidence/04-chapter-04.png |
+| 2026-11-05 | 4 | Chapter 5 | evidence/05-chapter-05.png |
+| 2026-11-06 | 4 | Chapter 6 | evidence/06-chapter-06.png |
+| 2026-11-09 | 4 | Chapter 7 | evidence/07-chapter-07.png |
+| Total | 28 | | |
 
 ## Labs
 
