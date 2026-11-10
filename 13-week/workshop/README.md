@@ -11,7 +11,7 @@
 - REFLECTION_DOC:
 - LIBRARY_BOOK: Costas Santos, Jesus. Seguridad informatica. 1st ed. Bogota: Ediciones de la U / Ra-Ma, 2011. ISBN 978-958-8675-70-1. Call number 005.8 C838s (Campus Prado Alto). Used: ch. 1 (1.2, 1.4), ch. 3 (3.2, 3.3)
 - LIBRARY_RECORD_TIME:
-- STORIES: https://github.com/code-corhuila/ftx-docs/issues/56, https://github.com/code-corhuila/ftx-docs/issues/57, https://github.com/code-corhuila/ftx-docs/issues/58
+- STORIES: https://github.com/code-corhuila/ftx-docs/issues/56 (S, risk 9, P0, related #60), https://github.com/code-corhuila/ftx-docs/issues/57 (E, risk 6, P1, related #64), https://github.com/code-corhuila/ftx-docs/issues/58 (D, risk 6, P1, related #51)
 <!-- CONFIG-END -->
 
 ## Files
