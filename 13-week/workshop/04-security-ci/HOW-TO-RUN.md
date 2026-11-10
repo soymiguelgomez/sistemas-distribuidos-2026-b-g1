@@ -47,6 +47,47 @@ docker run --rm -v //var/run/docker.sock:/var/run/docker.sock -v "${PWD}:/w" -w 
 2. `dependency-audit`: OWASP dependency-check, fails on CVSS >= 7 (needs the `NVD_API_KEY` secret).
 3. `authorization-tests`: the negative tests above.
 
-## Console output
+## Console output (CP8)
 
-Pending (CP8).
+Where it ran: GitHub Actions, `ubuntu-latest`, workflow `.github/workflows/w13-negative-test.yml`
+in this fork, run https://github.com/soymiguelgomez/sistemas-distribuidos-2026-b-g1/actions/runs/42843284626
+on 2026-11-10. My laptop cannot run Docker today: WSL and Virtual Machine Platform are disabled in
+Windows, and turning them on needs an administrator and a restart.
+
+Negative test (`mvn -B test -Dtest='*NegativeTest'`):
+
+```text
+[INFO]  T E S T S
+[INFO] -------------------------------------------------------
+[INFO] Running com.futbolix.reservation.messaging.BrokerAuthorizationNegativeTest
+SLF4J: Failed to load class "org.slf4j.impl.StaticLoggerBinder".
+SLF4J: Defaulting to no-operation (NOP) logger implementation
+SLF4J: See http://www.slf4j.org/codes.html#StaticLoggerBinder for further details.
+[INFO] Tests run: 3, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 15.35 s -- in com.futbolix.reservation.messaging.BrokerAuthorizationNegativeTest
+[INFO]
+[INFO] Results:
+[INFO]
+[INFO] Tests run: 3, Failures: 0, Errors: 0, Skipped: 0
+[INFO]
+[INFO] ------------------------------------------------------------------------
+[INFO] BUILD SUCCESS
+[INFO] ------------------------------------------------------------------------
+[INFO] Total time:  25.243 s
+[INFO] Finished at: 2026-11-10T15:21:03Z
+```
+
+All three cases pass, so the broker answered 403 `ACCESS_REFUSED` to `reservation-service`
+publishing `payment.approved`, 406 `PRECONDITION_FAILED` to the forged `user_id`, and confirmed
+the publish of `payment-service`. The SLF4J lines are only a logging warning (no logger binding
+for Testcontainers); they do not affect the result.
+
+## Workflow validation (CP8)
+
+`actionlint` 1.7.7 over `security.yml`, same run:
+
+```text
+Status: Downloaded newer image for rhysd/actionlint:1.7.7
+actionlint finished with no errors
+```
+
+actionlint printed no findings and exited with code 0, so `security.yml` is valid.
