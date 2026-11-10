@@ -1,0 +1,29 @@
+# Runs the CP8 checks of the week 13 workshop on demand:
+# actionlint over the proposed security.yml and the negative broker authorization test.
+name: w13-negative-test
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  cp8:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Validate security.yml with actionlint
+        continue-on-error: true
+        run: docker run --rm -v "$PWD:/repo" -w /repo rhysd/actionlint:1.7.7 -color 13-week/workshop/04-security-ci/security.yml && echo "actionlint: no errors"
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '21'
+          cache: maven
+
+      - name: Negative authorization test (BrokerAuthorizationNegativeTest)
+        working-directory: 13-week/workshop/04-security-ci/broker-authz-test
+        run: mvn -B test -Dtest='*NegativeTest'
