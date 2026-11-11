@@ -25,7 +25,8 @@
 | 2026-11-06 | 4 | Chapter 6 | evidence/06-chapter-06.png |
 | 2026-11-09 | 6 | Chapters 7 and 8 | evidence/07-chapter-07.png, evidence/08-chapter-08.png |
 | 2026-11-10 | 4 | Chapter 9 | evidence/09-chapter-09.png |
-| Total | 34 | | |
+| 2026-11-11 | 4 | Chapter 10 | evidence/10-chapter-10.png |
+| Total | 38 | | |
 
 ## Labs
 
