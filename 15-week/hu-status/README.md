@@ -15,13 +15,13 @@
 | HU ID | Title | Status (todo/doing/done) | Evidence (PR or commit URL) |
 |---|---|---|---|
 | HU-ADM-001 | Manage courts: courts schema, seed of the four courts and least-privilege roles (ftx-courts-db) | doing | https://github.com/code-corhuila/ftx-courts-db/pull/1 |
-| HU-ADM-001 | Manage courts: courts API (list, get, administrator update) with tests (ftx-courts-api) | doing | https://github.com/code-corhuila/ftx-courts-api/pull/1 |
-| HU-ADM-001 / HU-RES-001 | Schedules API: weekly schedule, bookable slots (status and price read from ftx-courts-api) and administrator changes (ftx-schedules-api) | doing | https://github.com/code-corhuila/ftx-schedules-api/pull/1 |
+| HU-ADM-001 | Manage courts: courts API (list, get, administrator update) with tests (ftx-courts-api; split in #2 to #5) | doing | https://github.com/code-corhuila/ftx-courts-api/pull/2 |
+| HU-ADM-001 / HU-RES-001 | Schedules API: weekly schedule, bookable slots (status and price read from ftx-courts-api) and administrator changes (ftx-schedules-api; split in #2 to #5) | doing | https://github.com/code-corhuila/ftx-schedules-api/pull/2 |
 | N/A (no HU ID) | Single PostgreSQL instance aligned with Annex J and one login user per domain (ftx-infra-postgres) | doing | https://github.com/code-corhuila/ftx-infra-postgres/pull/12 |
 | N/A (security story #56, #57, #58) | RabbitMQ broker with one least-privilege user per service (ftx-infra-postgres) | doing | https://github.com/code-corhuila/ftx-infra-postgres/pull/11 |
 | N/A (no HU ID) | Remove the fixed admin password and personal-looking seed data from the frontend mock (ftx-front) | doing | https://github.com/code-corhuila/ftx-front/pull/17 |
 | HU-ADM-002 | Administrator login: customers schema with administrator accounts and refresh tokens (ftx-customers-db) | doing | https://github.com/code-corhuila/ftx-customers-db/pull/2 |
-| HU-ADM-002 | Administrator login: login, refresh, logout and JWKS with lockout and rate limit (ftx-customers-api) | doing | https://github.com/code-corhuila/ftx-customers-api/pull/2 |
+| HU-ADM-002 | Administrator login: login, refresh, logout and JWKS with lockout and rate limit (ftx-customers-api; split in #3 to #8) | doing | https://github.com/code-corhuila/ftx-customers-api/pull/3 |
 | HU-ADM-002 | Frontend uses the real login and courts services while reservations stay simulated (ftx-front) | doing | https://github.com/code-corhuila/ftx-front/pull/19 |
 | HU-ADM-001 / HU-ADM-002 | Courts and schedules APIs check the administrator JWT instead of trusting X-User headers (security fix) | doing | https://github.com/code-corhuila/ftx-courts-api/pull/1#issuecomment-6801845127 |
 | HU-RES-002 | Reject reservations that start in the past, and its frontend tests (ftx-front) | done | https://github.com/code-corhuila/ftx-front/pull/8 |
@@ -63,18 +63,18 @@
 
 ## 6. Evidence links
 - https://github.com/code-corhuila/ftx-courts-db/pull/1
-- https://github.com/code-corhuila/ftx-courts-api/pull/1
-- https://github.com/code-corhuila/ftx-schedules-api/pull/1
+- https://github.com/code-corhuila/ftx-courts-api/pull/2 to /pull/5 (one change split in four parts; the first full pull request, with the live-run comments, is https://github.com/code-corhuila/ftx-courts-api/pull/1)
+- https://github.com/code-corhuila/ftx-schedules-api/pull/2 to /pull/5 (split in four parts; first full pull request: https://github.com/code-corhuila/ftx-schedules-api/pull/1)
 - https://github.com/code-corhuila/ftx-infra-postgres/pull/12
 - https://github.com/code-corhuila/ftx-infra-postgres/pull/11
 - https://github.com/code-corhuila/ftx-front/pull/17
 - https://github.com/code-corhuila/ftx-docs/pull/55
 - https://github.com/code-corhuila/ftx-customers-db/pull/2
-- https://github.com/code-corhuila/ftx-customers-api/pull/2
+- https://github.com/code-corhuila/ftx-customers-api/pull/3 to /pull/8 (split in six parts; first full pull requests: https://github.com/code-corhuila/ftx-customers-api/pull/1 and /pull/2)
 - https://github.com/code-corhuila/ftx-front/pull/19
 - https://github.com/code-corhuila/ftx-front/pull/8
 - https://github.com/code-corhuila/ftx-infra-postgres/pull/13
 - https://github.com/code-corhuila/ftx-docs/pull/67
 - https://github.com/code-corhuila/ftx-docs/pull/43
 - https://github.com/code-corhuila/ftx-schedules-api/pull/1#issuecomment-6806942739
-- Self-check notes: user story branches follow `hu-xxx-dev` (`hu-adm-001-dev` in courts and schedules, `hu-adm-002-dev` in customers and the frontend; the first customers and frontend pull requests were replaced by `ftx-customers-db#2`, `ftx-customers-api#2` and `ftx-front#19` after renaming their `feat/` branches). Infrastructure and docs work has no HU ID and keeps `feat/` and `docs/` branches, which `00-governance/branching-policy.md` allows. The courts, schedules and customers API pull requests exceed the 400-line limit of `git-conventions.md`; registered as TD-007 in `15-project-control/tech-backlog.md`. All test results are from local runs because CI is locked by billing. `docker build` and `docker compose up` are not verified (TD-003).
+- Self-check notes: user story branches follow `hu-xxx-dev` (`hu-adm-001-dev` in courts and schedules, `hu-adm-002-dev` in customers and the frontend; the first customers and frontend pull requests were replaced by `ftx-customers-db#2`, `ftx-customers-api#2` and `ftx-front#19` after renaming their `feat/` branches). Infrastructure and docs work has no HU ID and keeps `feat/` and `docs/` branches, which `00-governance/branching-policy.md` allows. The courts, schedules and customers API pull requests were longer than the 400 lines of code of `git-conventions.md`, so each one was split into stacked parts of at most 400 lines that compile and pass their own tests (`ftx-courts-api#2`-`#5`, `ftx-schedules-api#2`-`#5`, `ftx-customers-api#3`-`#8`). All test results are from local runs because CI is locked by billing. `docker build` and `docker compose up` are not verified (TD-003).
