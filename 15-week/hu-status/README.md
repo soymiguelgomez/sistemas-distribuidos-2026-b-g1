@@ -20,9 +20,9 @@
 | N/A (no HU ID) | Single PostgreSQL instance aligned with Annex J and one login user per domain (ftx-infra-postgres) | doing | https://github.com/code-corhuila/ftx-infra-postgres/pull/12 |
 | N/A (security story #56, #57, #58) | RabbitMQ broker with one least-privilege user per service (ftx-infra-postgres) | doing | https://github.com/code-corhuila/ftx-infra-postgres/pull/11 |
 | N/A (no HU ID) | Remove the fixed admin password and personal-looking seed data from the frontend mock (ftx-front) | doing | https://github.com/code-corhuila/ftx-front/pull/17 |
-| HU-ADM-002 | Administrator login: customers schema with administrator accounts and refresh tokens (ftx-customers-db) | doing | https://github.com/code-corhuila/ftx-customers-db/pull/1 |
-| HU-ADM-002 | Administrator login: login, refresh, logout and JWKS with lockout and rate limit (ftx-customers-api) | doing | https://github.com/code-corhuila/ftx-customers-api/pull/1 |
-| HU-ADM-002 | Frontend uses the real login and courts services while reservations stay simulated (ftx-front) | doing | https://github.com/code-corhuila/ftx-front/pull/18 |
+| HU-ADM-002 | Administrator login: customers schema with administrator accounts and refresh tokens (ftx-customers-db) | doing | https://github.com/code-corhuila/ftx-customers-db/pull/2 |
+| HU-ADM-002 | Administrator login: login, refresh, logout and JWKS with lockout and rate limit (ftx-customers-api) | doing | https://github.com/code-corhuila/ftx-customers-api/pull/2 |
+| HU-ADM-002 | Frontend uses the real login and courts services while reservations stay simulated (ftx-front) | doing | https://github.com/code-corhuila/ftx-front/pull/19 |
 | HU-ADM-001 / HU-ADM-002 | Courts and schedules APIs check the administrator JWT instead of trusting X-User headers (security fix) | doing | https://github.com/code-corhuila/ftx-courts-api/pull/1#issuecomment-6801845127 |
 | HU-RES-002 | Reject reservations that start in the past, and its frontend tests (ftx-front) | done | https://github.com/code-corhuila/ftx-front/pull/8 |
 | N/A (no HU ID) | ADR-011 and ADR-012: runtime of courts, schedules and customers, and per-service JWT check (ftx-docs) | doing | https://github.com/code-corhuila/ftx-docs/pull/67 |
@@ -35,10 +35,10 @@
 - `ftx-infra-postgres`: `PG_*` variables, `env/` files, `platform` network and an init script that creates `schedules_app`, `courts_app`, `reservations_app`, `payments_app`; cross-domain permission checks recorded in https://github.com/code-corhuila/ftx-infra-postgres/pull/12#issuecomment-6782275074
 - Answered the TB4 threat model review (`traceparent` in AMQP headers, `processed_events` against replays): https://github.com/code-corhuila/ftx-docs/pull/55
 - Team plan for MVP 3, sprints and the final project, shared with the team.
-- `ftx-customers-db` (HU-ADM-002): `customers.user_account` and `customers.refresh_token` from `06-data/data-dictionary.md` (user-service). The database refuses anything that is not a BCrypt hash, no administrator is seeded, and `customers_reader` cannot read the hash columns. Rebuild check passed on PostgreSQL 16.15 (migrate, migrate again, rollback, migrate): https://github.com/code-corhuila/ftx-customers-db/pull/1
-- `ftx-customers-api` (HU-ADM-002, `auth-service.yaml`): RS256 access token of 1 hour, opaque refresh token of 7 days stored with BCrypt and rotated on every use, reuse of a spent token revokes its family, lockout after 5 failures, 10 attempts per address in 5 minutes, security events without emails or tokens, and the first administrator created from a BCrypt hash given at deployment. 60 tests, including two-owner tests and integration on the real migrations: https://github.com/code-corhuila/ftx-customers-api/pull/1
+- `ftx-customers-db` (HU-ADM-002): `customers.user_account` and `customers.refresh_token` from `06-data/data-dictionary.md` (user-service). The database refuses anything that is not a BCrypt hash, no administrator is seeded, and `customers_reader` cannot read the hash columns. Rebuild check passed on PostgreSQL 16.15 (migrate, migrate again, rollback, migrate): https://github.com/code-corhuila/ftx-customers-db/pull/2
+- `ftx-customers-api` (HU-ADM-002, `auth-service.yaml`): RS256 access token of 1 hour, opaque refresh token of 7 days stored with BCrypt and rotated on every use, reuse of a spent token revokes its family, lockout after 5 failures, 10 attempts per address in 5 minutes, security events without emails or tokens, and the first administrator created from a BCrypt hash given at deployment. 60 tests, including two-owner tests and integration on the real migrations: https://github.com/code-corhuila/ftx-customers-api/pull/2
 - Security fix in `ftx-courts-api` and `ftx-schedules-api`: they trusted `X-User-Id` / `X-User-Role` while their ports are published, so anyone could change a price or a schedule. Both now check the JWT with the JWKS of `ftx-customers-api`; spoofed headers answer 401 in a live run with the three services (45 and 37 tests): https://github.com/code-corhuila/ftx-courts-api/pull/1#issuecomment-6801845127 and https://github.com/code-corhuila/ftx-schedules-api/pull/1#issuecomment-6806942739
-- `ftx-front`: mixed mode with the real login and courts services and a development proxy; checked in the browser (real login, price change saved in PostgreSQL). 84 tests: https://github.com/code-corhuila/ftx-front/pull/18
+- `ftx-front`: mixed mode with the real login and courts services and a development proxy; checked in the browser (real login, price change saved in PostgreSQL). 84 tests: https://github.com/code-corhuila/ftx-front/pull/19
 - `ftx-docs`: ADR-011 and ADR-012 (`ftx-customers-*` hosts the documented user-service, answering the open point of ADR-009); resolved the conflict of the Week 08 planning PR and merged it after its approval: https://github.com/code-corhuila/ftx-docs/pull/43
 
 ## 3. Blockers and risks
@@ -69,12 +69,12 @@
 - https://github.com/code-corhuila/ftx-infra-postgres/pull/11
 - https://github.com/code-corhuila/ftx-front/pull/17
 - https://github.com/code-corhuila/ftx-docs/pull/55
-- https://github.com/code-corhuila/ftx-customers-db/pull/1
-- https://github.com/code-corhuila/ftx-customers-api/pull/1
-- https://github.com/code-corhuila/ftx-front/pull/18
+- https://github.com/code-corhuila/ftx-customers-db/pull/2
+- https://github.com/code-corhuila/ftx-customers-api/pull/2
+- https://github.com/code-corhuila/ftx-front/pull/19
 - https://github.com/code-corhuila/ftx-front/pull/8
 - https://github.com/code-corhuila/ftx-infra-postgres/pull/13
 - https://github.com/code-corhuila/ftx-docs/pull/67
 - https://github.com/code-corhuila/ftx-docs/pull/43
 - https://github.com/code-corhuila/ftx-schedules-api/pull/1#issuecomment-6806942739
-- Self-check notes: the courts and schedules branches follow `hu-adm-001-dev`, but the customers, frontend, infrastructure and docs branches are `feat/` and `docs/` branches toward `develop` (`00-governance/branching-policy.md` allows them), not `hu-xxx-dev`. All test results are from local runs because CI is locked by billing. `docker build` and `docker compose up` are not verified.
+- Self-check notes: user story branches follow `hu-xxx-dev` (`hu-adm-001-dev` in courts and schedules, `hu-adm-002-dev` in customers and the frontend; the first customers and frontend pull requests were replaced by `ftx-customers-db#2`, `ftx-customers-api#2` and `ftx-front#19` after renaming their `feat/` branches). Infrastructure and docs work has no HU ID and keeps `feat/` and `docs/` branches, which `00-governance/branching-policy.md` allows. The courts, schedules and customers API pull requests exceed the 400-line limit of `git-conventions.md`; registered as TD-007 in `15-project-control/tech-backlog.md`. All test results are from local runs because CI is locked by billing. `docker build` and `docker compose up` are not verified (TD-003).
